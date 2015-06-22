@@ -1,10 +1,23 @@
-SRC_FILES  = src/main.c src/example_src_1.c
-INCLUDES   = -I./include
-EXECUTABLE = target/example_program
-FLAGS      = -Wall -Wextra -pedantic -std=c99
+CC         := gcc
+FLAGS      := -Wall -Wextra -pedantic -std=c99
 
-all :
-	gcc $(FLAGS) $(INCLUDES) $(SRC_FILES) -o $(EXECUTABLE)
+SRC_FILES  := $(wildcard src/*.c)
+INCLUDES   := -Iinclude
+
+EXECUTABLE := target/example_program
+
+ifeq ($(MAKECMDGOALS),test)
+  EXECUTABLE := target/test
+
+  SRC_FILES  := $(filter-out %main.c,$(SRC_FILES))
+
+  SRC_FILES  += tests/src/tests.c
+  INCLUDES   += -Itests/include
+endif
+
+all, test :
+	@echo "Building $(EXECUTABLE)"
+	$(CC) $(FLAGS) $(INCLUDES) $(SRC_FILES) -o $(EXECUTABLE)
 
 clean :
-	rm -rf ./target/* $(EXECUTABLE)
+	rm -rf target/*
