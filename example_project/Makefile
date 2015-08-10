@@ -24,7 +24,6 @@ $(executable) : $(src_files) $(header_files)
 
 test : $(executable)
 	$(executable)
-	cat $(test_log)
 
 clean :
 	rm -rf $(mk_dir)/target

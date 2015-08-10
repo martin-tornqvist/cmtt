@@ -1,5 +1,5 @@
 """
-Statement deletion mutations
+Boolean operator mutations
 """
 
 class Mutator():
