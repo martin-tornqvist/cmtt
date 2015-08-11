@@ -1,7 +1,13 @@
 #!/bin/bash
 
-example_project_dir=./example_project
+echo "Example runner for [Mutation tool]"
 
-./run_mutation_tests.py \
-    --project-root=$example_project_dir \
-    --config-path=$example_project_dir/mutation_config
+example_path=`readlink -e ./example_project`
+
+echo "Example project path: $example_path"
+echo "-------------------------------------------------------------------------"
+
+./mutation_test.py \
+    --project-root=$example_path \
+    --config-path=$example_path/mutation_config \
+    --output-path=$example_path/mutation_output
