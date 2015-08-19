@@ -5,8 +5,8 @@ Main module
 """
 
 #
-# TODO: Do a sanity check of the config-path directory somewhere
-# (are all necessary files there?)
+# TODO: Do a sanity check of the config-path directory somewhere to make sure
+# all necessary files are there.
 #
 
 #===============================================================================
@@ -14,19 +14,18 @@ Main module
 #===============================================================================
 import sys
 import os
-import subprocess
 import random
-
 import argparse
-from argparse import RawTextHelpFormatter
 
-import mutators.boolean
+import mutators.list
+
+import proc.test
 
 #===============================================================================
 # Common definitions
 #===============================================================================
-TEST_EXECUTION_HOOK_NAME    = 'execute-tests'
-SRC_LIST_NAME               = 'src-list'
+TEST_EXECUTION_HOOK_NAME = 'execute-tests'
+SRC_LIST_NAME = 'src-list'
 
 #===============================================================================
 # Arguments
@@ -36,49 +35,58 @@ PARSER = argparse.ArgumentParser(
                     '\n'
                     'See the example_project directory for an example on how\n'
                     'to set up the tool.',
-                    formatter_class = RawTextHelpFormatter)
+                    formatter_class=argparse.RawTextHelpFormatter)
 
-PARSER.add_argument('-p', '--project-root',
+PARSER.add_argument(
+                    '-p', '--project-root',
                     help=
                     'Absolute path to the root directory of your project\n'
                     '(e.g. a Git repo).',
-                    required = True)
+                    required=True)
 
-PARSER.add_argument('-c', '--config-path',
+PARSER.add_argument(
+                    '-c', '--config-path',
                     help=
                     'Absolute path to a directory containing user provided\n'
-                    'hook scripts and configuration files.\n'
+                    'hook scripts and configuration files. When any user\n'
+                    'provided script is executed, the current directory is\n'
+                    'changed to the configuration directory.\n'
                     '\n'
-                    'This directory should contain the following files:\n'
+                    'The configuration directory should contain the\n'
+                    'following files:\n'
                     '\n'
                     + '"' + TEST_EXECUTION_HOOK_NAME + '"' + '\n'
                     '   A script (bash/python/etc) building and running\n'
                     '   your test suite (e.g. by Make commands).\n'
                     '\n'
                     + '"' + SRC_LIST_NAME + '"' + '\n'
-                    '   A text file containing a list of source files to\n'
-                    '   mutate (absolute paths, or relative to project root).',
-                    required = True)
+                    '   A text file containing a mutator_list of source\n'
+                    '   files to mutate (absolute paths, or relative to\n'
+                    '   project root)',
+                        required=True)
 
-PARSER.add_argument('-o', '--output-path',
+PARSER.add_argument(
+                    '-o', '--output-path',
                     help=
                     'Absolute path to a directory where reports will be\n'
                     'written. This is also used as a working directory to\n'
                     'store temporary files.',
-                    required = True)
+                    required=True)
 
-PARSER.add_argument('-s', '--rng-seed',
+PARSER.add_argument(
+                    '-s', '--rng-seed',
                     help=
                     'Optional custom seed for the random number generator.\n'
-                    'Can be useful to deterministically recreate test runs.',
-                    required = False)
+                    'Can be useful to deterministically recreate test runs.\n'
+                    'If not specified, the current date and time is used.',
+                    required=False)
 
 ARGS = PARSER.parse_args()
 
 PROJECT_ROOT = ARGS.project_root
-CONFIG_PATH  = ARGS.config_path
-OUTPUT_PATH  = ARGS.output_path
-RNG_SEED     = ARGS.rng_seed
+CONFIG_PATH = ARGS.config_path
+OUTPUT_PATH = ARGS.output_path
+RNG_SEED = ARGS.rng_seed
 
 print 'Paths:'
 print ' * PROJECT_ROOT ' , PROJECT_ROOT
@@ -88,55 +96,104 @@ print ' * OUTPUT_PATH  ' , OUTPUT_PATH
 #===============================================================================
 # Main function
 #===============================================================================
+
+def print_info(text):
+    '''TBD'''
+    print '>>> ' + text
+
+def print_empty_lines():
+    '''TBD'''
+    print '\n'
+
+def print_error_and_exit(text):
+    '''TBD'''
+    print_empty_lines()
+    print 'ERROR: ' + text
+    sys.exit()
+
 def main():
     '''
     Entry point
-    '''  
+    '''
     os.chdir(CONFIG_PATH)
 
-    # Init RNG
+    # Init random number generator
     rng = random.Random()
 
     if RNG_SEED:
-        print 'Using custom seed: ' + RNG_SEED
+        print_info('Using custom seed: ' + RNG_SEED)
         rng.seed(RNG_SEED)
 
-    # Read the source list file, and shuffle the list
+    # Read the source mutator_list file into a list, and shuffle the list
     with open(SRC_LIST_NAME) as src_list_f:
         src_list = src_list_f.read().splitlines()
 
     rng.shuffle(src_list)
 
+    # Get a list of mutators
+    mutator_list = mutators.list.get()
+
     os.chdir(PROJECT_ROOT)
 
-    # Get the last source file in the list, and erase that entry
-    src_file_rel_path = src_list.pop(-1)
+    src_file_path = src_list.pop()
 
-    print ''
-    print 'Source file to mutate: ' + src_file_rel_path
+    print_empty_lines()
 
-    # Make a list of possible mutators, and shuffle the list
-    mutator_list = [mutators.boolean.Mutator()]
+    print_info('Current source file to mutate: ' + src_file_path)
 
-    rng.shuffle(mutator_list)
+    # Verify that the file exists
+    if os.path.isfile(src_file_path) == False:
+        print_error_and_exit('Could not find ' + src_file_path)
 
-    # Get the last source file in the list, and erase that entry
-    mutator = mutator_list.pop(-1)
+    # Read the source file
+    with open(src_file_path, 'r') as src_f:
+        src_file_origin_content = src_f.read()
 
-    print ''
-    print 'Attempting to apply mutator: ' + mutator.__module__
-    mutator.run()
+    src_file_origin_lines = src_file_origin_content.splitlines()
 
-    print ''
-    print 'Mutation successful!'
+    nr_lines = len(src_file_origin_lines)
 
-    print ''
-    print 'Running user test execution hook script at: ' + \
-        CONFIG_PATH + '/' + TEST_EXECUTION_HOOK_NAME
+    print_info('Read ' + str(nr_lines) + ' lines')
 
-    os.chdir(CONFIG_PATH)
+    # Iterate over each line in the source file
+    for cur_line_nr in range(0, nr_lines):
 
-    subprocess.call(['./' + TEST_EXECUTION_HOOK_NAME])
+        print_empty_lines()
+        print_info('Currently at line: ' + str(cur_line_nr + 1) + '/' +
+                   str(nr_lines) + '\n')
+
+        # Try each mutator on the current line
+        for mutator in mutator_list:
+
+            # Copy the source file lines
+            src_file_working_lines = list(src_file_origin_lines)
+
+            print_info('Attempting to apply "' + mutator.__module__ + '"' +
+                       ' at or near the current line.')
+            mutate_status = mutator.run(src_file_working_lines, cur_line_nr)
+
+            if mutate_status == mutators.codes.MUTATE_OK:
+                print_info('Mutation applied')
+
+                print_info('Writing modified source file')
+                with open(src_file_path, 'w') as src_f:
+                    src_f.write('\n'.join(src_file_working_lines))
+
+                os.chdir(CONFIG_PATH)
+
+                print_info('Running user test execution hook script at:' +
+                    CONFIG_PATH + '/' + TEST_EXECUTION_HOOK_NAME)
+
+                proc.test.run()
+
+                os.chdir(PROJECT_ROOT)
+
+                print_info('Restoring source file')
+                with open(src_file_path, 'w') as src_f:
+                    src_f.write(src_file_origin_content)
+
+            else:
+                print_info('Mutation did not apply')
 
 if __name__ == "__main__":
     sys.exit(main())

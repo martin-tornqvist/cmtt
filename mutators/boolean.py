@@ -2,11 +2,19 @@
 Boolean operator mutations
 """
 
-class Mutator():
-    'Docstring'
+from mutators import base
+from mutators import codes
+
+class Mutator(base.Mutator):
+    """
+    TBD
+    """
 
     def __init__(self):
-        'Nothing to do'
+        base.Mutator.__init__(self)
 
-    def run(self):
-        'TBD'
+    def run(self, lines, line_nr):
+        """
+        TBD
+        """
+        return codes.MUTATE_FAILED
