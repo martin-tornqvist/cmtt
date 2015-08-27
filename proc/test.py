@@ -4,10 +4,10 @@ TBD
 
 import subprocess
 
-from mutation_test import TEST_EXECUTION_HOOK_NAME
+from proc import paths
 
 def run():
     '''
     TBD
     '''
-    subprocess.call(['./' + TEST_EXECUTION_HOOK_NAME])
+    subprocess.call(['./' + paths.TEST_EXECUTION_HOOK_NAME])

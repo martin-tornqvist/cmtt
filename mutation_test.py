@@ -19,15 +19,10 @@ import argparse
 
 import mutators.list
 
+import proc.paths
 import proc.test
 
 import util.trace
-
-#===============================================================================
-# Common definitions
-#===============================================================================
-TEST_EXECUTION_HOOK_NAME = 'execute-tests'
-SRC_LIST_NAME = 'src-list'
 
 #===============================================================================
 # Arguments
@@ -57,11 +52,11 @@ PARSER.add_argument(
                     'The configuration directory should contain the\n'
                     'following files:\n'
                     '\n'
-                    + '"' + TEST_EXECUTION_HOOK_NAME + '"' + '\n'
+                    + '"' + proc.paths.TEST_EXECUTION_HOOK_NAME + '"' + '\n'
                     '   A script (bash/python/etc) building and running\n'
                     '   your test suite (e.g. by Make commands).\n'
                     '\n'
-                    + '"' + SRC_LIST_NAME + '"' + '\n'
+                    + '"' + proc.paths.SRC_LIST_NAME + '"' + '\n'
                     '   A text file containing a mutator_list of source\n'
                     '   files to mutate (absolute paths, or relative to\n'
                     '   project root)',
@@ -90,10 +85,10 @@ CONFIG_PATH = ARGS.config_path
 OUTPUT_PATH = ARGS.output_path
 RNG_SEED = ARGS.rng_seed
 
-print 'Paths:'
-print ' * PROJECT_ROOT ' , PROJECT_ROOT
-print ' * CONFIG_PATH  ' , CONFIG_PATH
-print ' * OUTPUT_PATH  ' , OUTPUT_PATH
+util.trace.info('Paths:\n' + \
+                ' * PROJECT_ROOT ' + PROJECT_ROOT + '\n' + \
+                ' * CONFIG_PATH  ' + CONFIG_PATH + '\n' + \
+                ' * OUTPUT_PATH  ' + OUTPUT_PATH)
 
 #===============================================================================
 # Main function
@@ -112,7 +107,7 @@ def main():
         rng.seed(RNG_SEED)
 
     # Read the source mutator_list file into a list, and shuffle the list
-    with open(SRC_LIST_NAME) as src_list_f:
+    with open(proc.paths.SRC_LIST_NAME) as src_list_f:
         src_list = src_list_f.read().splitlines()
 
     rng.shuffle(src_list)
@@ -173,7 +168,7 @@ def main():
                 os.chdir(CONFIG_PATH)
 
                 util.trace.info('Running user test execution hook script at:' +
-                    CONFIG_PATH + '/' + TEST_EXECUTION_HOOK_NAME)
+                    CONFIG_PATH + '/' + proc.paths.TEST_EXECUTION_HOOK_NAME)
 
                 proc.test.run()
 

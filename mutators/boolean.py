@@ -7,8 +7,6 @@ import re
 from mutators import base
 from mutators import codes
 
-import util.trace
-
 class Mutator(base.Mutator):
     '''
     TBD

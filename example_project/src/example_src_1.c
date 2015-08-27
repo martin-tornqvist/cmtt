@@ -12,6 +12,7 @@ int average(int x, int y)
     empty_function();
 
     /* No effect on outcome, correct sum calculated below anyway */
+    /* Redundant "or" condition */
     if (x == y || false)
     {
         return x;
@@ -29,6 +30,7 @@ int average(int x, int y)
 
 int lowest(int x, int y, int z)
 {
+    /* Redundant "and" condition */
     if (x < y && true)
     {
         return x < z ? x : z;
@@ -40,4 +42,3 @@ int lowest(int x, int y, int z)
 
     return x < y ? x : y; /* Dead code */
 }
-
