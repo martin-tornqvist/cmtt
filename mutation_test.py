@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-"""
+'''
 Main module
-"""
+'''
 
 #
 # TODO: Do a sanity check of the config-path directory somewhere to make sure
@@ -20,6 +20,8 @@ import argparse
 import mutators.list
 
 import proc.test
+
+import util.trace
 
 #===============================================================================
 # Common definitions
@@ -96,21 +98,6 @@ print ' * OUTPUT_PATH  ' , OUTPUT_PATH
 #===============================================================================
 # Main function
 #===============================================================================
-
-def print_info(text):
-    '''TBD'''
-    print '>>> ' + text
-
-def print_empty_lines():
-    '''TBD'''
-    print '\n'
-
-def print_error_and_exit(text):
-    '''TBD'''
-    print_empty_lines()
-    print 'ERROR: ' + text
-    sys.exit()
-
 def main():
     '''
     Entry point
@@ -121,7 +108,7 @@ def main():
     rng = random.Random()
 
     if RNG_SEED:
-        print_info('Using custom seed: ' + RNG_SEED)
+        util.trace.info('Using custom seed: ' + RNG_SEED)
         rng.seed(RNG_SEED)
 
     # Read the source mutator_list file into a list, and shuffle the list
@@ -137,13 +124,13 @@ def main():
 
     src_file_path = src_list.pop()
 
-    print_empty_lines()
+    util.trace.empty_lines()
 
-    print_info('Current source file to mutate: ' + src_file_path)
+    util.trace.info('Current source file to mutate: ' + src_file_path)
 
     # Verify that the file exists
     if os.path.isfile(src_file_path) == False:
-        print_error_and_exit('Could not find ' + src_file_path)
+        util.trace.exit_error('Could not find ' + src_file_path)
 
     # Read the source file
     with open(src_file_path, 'r') as src_f:
@@ -153,14 +140,16 @@ def main():
 
     nr_lines = len(src_file_origin_lines)
 
-    print_info('Read ' + str(nr_lines) + ' lines')
+    util.trace.info('Read ' + str(nr_lines) + ' lines')
 
     # Iterate over each line in the source file
     for cur_line_nr in range(0, nr_lines):
 
-        print_empty_lines()
-        print_info('Currently at line: ' + str(cur_line_nr + 1) + '/' +
-                   str(nr_lines) + '\n')
+        util.trace.empty_lines()
+
+        util.trace.info('Original line (' + \
+                        str(cur_line_nr + 1) + '/' + str(nr_lines) + '):\n' + \
+                        src_file_origin_lines[cur_line_nr])
 
         # Try each mutator on the current line
         for mutator in mutator_list:
@@ -168,32 +157,34 @@ def main():
             # Copy the source file lines
             src_file_working_lines = list(src_file_origin_lines)
 
-            print_info('Attempting to apply "' + mutator.__module__ + '"' +
-                       ' at or near the current line.')
-            mutate_status = mutator.run(src_file_working_lines, cur_line_nr)
+            util.trace.info('Attempting to apply "' + mutator.__module__ + '"')
+            mutate_result = mutator.run(src_file_working_lines,
+                                        cur_line_nr, rng)
 
-            if mutate_status == mutators.codes.MUTATE_OK:
-                print_info('Mutation applied')
+            if mutate_result == mutators.codes.MUTATE_OK:
+                util.trace.info('Modified line:\n' + \
+                                src_file_working_lines[cur_line_nr])
 
-                print_info('Writing modified source file')
+                util.trace.info('Writing modified source file')
+
                 with open(src_file_path, 'w') as src_f:
                     src_f.write('\n'.join(src_file_working_lines))
 
                 os.chdir(CONFIG_PATH)
 
-                print_info('Running user test execution hook script at:' +
+                util.trace.info('Running user test execution hook script at:' +
                     CONFIG_PATH + '/' + TEST_EXECUTION_HOOK_NAME)
 
                 proc.test.run()
 
                 os.chdir(PROJECT_ROOT)
 
-                print_info('Restoring source file')
+                util.trace.info('Restoring source file')
                 with open(src_file_path, 'w') as src_f:
                     src_f.write(src_file_origin_content)
 
             else:
-                print_info('Mutation did not apply')
+                util.trace.info('Line ignored by mutator')
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -12,7 +12,7 @@ int average(int x, int y)
     empty_function();
 
     /* No effect on outcome, correct sum calculated below anyway */
-    if (x == y)
+    if (x == y || false)
     {
         return x;
     }
@@ -29,7 +29,7 @@ int average(int x, int y)
 
 int lowest(int x, int y, int z)
 {
-    if (x < y)
+    if (x < y && true)
     {
         return x < z ? x : z;
     }
