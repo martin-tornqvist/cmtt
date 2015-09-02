@@ -2,8 +2,6 @@
 Arithmetic operator mutator
 '''
 
-import re
-
 from mutators import common
 from mutators import codes
 
@@ -14,34 +12,30 @@ def mutate(lines, line_nr, rng):
 
     line = lines[line_nr]
 
-    operators = [r' \+ ', r' \- ', r' \* ', r' \/ ', r' \% ']
+    op_re_list = [r' \+ ', r' \- ', r' \* ', r' \/ ', r' \% ']
 
-    rng.shuffle(operators)
+    rng.shuffle(op_re_list)
 
-    for operator_idx in range(0, len(operators)):
-        op_str = operators[operator_idx]
+    for op_idx in range(0, len(op_re_list)):
+        op_re_str = op_re_list[op_idx]
 
-        pattern = re.compile(op_str)
-
-        match_iterator = re.finditer(pattern, line)
-
-        match_list = list(match_iterator)
+        match_list = common.match_list(op_re_str, line)
 
         if match_list:
             # Remove the matched operator from the operator list
-            operators.pop(operator_idx)
+            op_re_list.pop(op_idx)
 
             # Choose a random replacement operator
-            op_repl_str = rng.choice(operators)
+            new_op_str = rng.choice(op_re_list)
 
             # Remove escape slashes
-            op_repl_str = common.strip_escapes(op_repl_str)
+            new_op_str = common.strip_escapes(new_op_str)
 
             # Choose a random match
             match = rng.choice(match_list)
 
             # Put the replacement operator in the line
-            line = line[:match.start()] + op_repl_str + line[match.end():]
+            line = line[:match.start()] + new_op_str + line[match.end():]
 
             lines[line_nr] = line
 
