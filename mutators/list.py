@@ -1,6 +1,6 @@
 '''
 This module contains a list of all mutators. This list must be kept up to date
-If mutator classes are added, removed or renamed.
+If mutators are added, removed or renamed.
 '''
 
 import mutators.boolean
@@ -13,7 +13,7 @@ def get():
 
     ret = []
 
-    ret.append(mutators.boolean.Mutator())
-    ret.append(mutators.arithmetic.Mutator())
+    ret.append(mutators.boolean.mutate)
+    ret.append(mutators.arithmetic.mutate)
 
     return ret

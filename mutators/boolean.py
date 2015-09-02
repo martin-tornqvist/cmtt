@@ -1,59 +1,52 @@
 '''
-Boolean operator mutations
+Boolean operator mutator
 '''
 
 import re
 
-from mutators import base
+from mutators import common
 from mutators import codes
 
-class Mutator(base.Mutator):
+import util.trace
+
+def mutate(lines, line_nr, rng):
     '''
     TBD
     '''
 
-    def __init__(self):
-        base.Mutator.__init__(self)
+    line = lines[line_nr]
 
-    def run(self, lines, line_nr, rng):
-        '''
-        TBD
-        '''
+    operators = [r'\&\&', r'\|\|']
 
-        line = lines[line_nr]
+    rng.shuffle(operators)
 
-        operators = [r'\&\&', r'\|\|']
+    for operator_idx in range(0, len(operators)):
+        op_str = operators[operator_idx]
 
-        rng.shuffle(operators)
+        pattern = re.compile(op_str)
 
-        for operator_idx in range(0, len(operators)):
-            op_str = operators[operator_idx]
+        match_iterator = re.finditer(pattern, line)
 
-            pattern = re.compile(op_str)
+        match_list = list(match_iterator)
 
-            match_iterator = re.finditer(pattern, line)
+        if match_list:
+            # Remove the matched operator from the operator list
+            operators.pop(operator_idx)
 
-            match_list = list(match_iterator)
+            # Choose a random replacement operator
+            op_repl_str = rng.choice(operators)
 
-            if match_list:
-                # Remove the matched operator from the operator list
-                operators.pop(operator_idx)
+            # Remove escape slashes
+            op_repl_str = common.strip_escapes(op_repl_str)
 
-                # Choose a random replacement operator
-                op_repl_str = rng.choice(operators)
+            # Choose a random match
+            match = rng.choice(match_list)
 
-                # Remove escape slashes
-                op_repl_str = op_repl_str.replace('\\', '')
+            # Put the replacement operator in the line
+            line = line[:match.start()] + op_repl_str + line[match.end():]
 
-                # Choose a random match
-                match = rng.choice(match_list)
+            lines[line_nr] = line
 
-                # Put the replacement operator in the line
-                line = line[:match.start()] + op_repl_str + line[match.end():]
+            return codes.MUTATE_OK
 
-                lines[line_nr] = line
-
-                return codes.MUTATE_OK
-
-
-        return codes.MUTATE_FAILED
+    return codes.MUTATE_FAILED

@@ -154,8 +154,7 @@ def main():
             # Copy the source file lines
             src_file_working_lines = list(src_file_origin_lines)
 
-            mutate_result = mutator.run(src_file_working_lines,
-                                        cur_line_nr, rng)
+            mutate_result = mutator(src_file_working_lines, cur_line_nr, rng)
 
             if mutate_result == mutators.codes.MUTATE_OK:
                 util.trace.info('Line modified by ' + mutator.__module__ +
