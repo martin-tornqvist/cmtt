@@ -4,6 +4,7 @@ If mutator classes are added, removed or renamed.
 '''
 
 import mutators.boolean
+import mutators.arithmetic
 
 def get():
     '''
@@ -13,5 +14,6 @@ def get():
     ret = []
 
     ret.append(mutators.boolean.Mutator())
+    ret.append(mutators.arithmetic.Mutator())
 
     return ret

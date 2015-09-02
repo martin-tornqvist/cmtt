@@ -1,5 +1,5 @@
 '''
-Boolean operator mutations
+Arithmetic operator mutations
 '''
 
 import re
@@ -22,7 +22,7 @@ class Mutator(base.Mutator):
 
         line = lines[line_nr]
 
-        operators = [r'\&\&', r'\|\|']
+        operators = [r' \+ ', r' \- ', r' \* ', r' \/ ', r' \% ']
 
         rng.shuffle(operators)
 

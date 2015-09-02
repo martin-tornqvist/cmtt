@@ -146,18 +146,20 @@ def main():
                         str(cur_line_nr + 1) + '/' + str(nr_lines) + '):\n' + \
                         src_file_origin_lines[cur_line_nr])
 
+        # TODO: Ignore empty lines, or lines inside comments
+
         # Try each mutator on the current line
         for mutator in mutator_list:
 
             # Copy the source file lines
             src_file_working_lines = list(src_file_origin_lines)
 
-            util.trace.info('Attempting to apply "' + mutator.__module__ + '"')
             mutate_result = mutator.run(src_file_working_lines,
                                         cur_line_nr, rng)
 
             if mutate_result == mutators.codes.MUTATE_OK:
-                util.trace.info('Modified line:\n' + \
+                util.trace.info('Line modified by ' + mutator.__module__ +
+                                ':\n' + \
                                 src_file_working_lines[cur_line_nr])
 
                 util.trace.info('Writing modified source file')
@@ -179,7 +181,7 @@ def main():
                     src_f.write(src_file_origin_content)
 
             else:
-                util.trace.info('Line ignored by mutator')
+                util.trace.info('Line ignored by ' + mutator.__module__)
 
 if __name__ == "__main__":
     sys.exit(main())
