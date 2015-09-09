@@ -49,18 +49,23 @@ PARSER.add_argument(
                     'provided script is executed, the current directory is\n'
                     'changed to the configuration directory.\n'
                     '\n'
-                    'The configuration directory should contain the\n'
+                    'The configuration directory must contain the\n'
                     'following files:\n'
                     '\n'
-                    + '"' + proc.paths.TEST_EXECUTION_HOOK_NAME + '"' + '\n'
+                    + '* ' + proc.paths.TEST_EXECUTION_HOOK_NAME + '\n'
                     '   A script (bash/python/etc) building and running\n'
                     '   your test suite (e.g. by Make commands).\n'
                     '\n'
-                    + '"' + proc.paths.SRC_LIST_NAME + '"' + '\n'
-                    '   A text file containing a mutator_list of source\n'
-                    '   files to mutate (absolute paths, or relative to\n'
-                    '   project root)',
-                        required=True)
+                    + '* ' + proc.paths.SRC_LIST_NAME + '\n'
+                    '   A text file containing a list of source files to \n'
+                    '   mutate (absolute paths, or relative to project root).\n'
+                    '\n'
+                    + '* ' + proc.paths.TEST_SRC_LIST_NAME + '\n'
+                    '   A text file containing a list of test source files\n'
+                    '   (absolute paths, or relative to project root). These\n'
+                    '   files are only read to determine if the source code\n'
+                    '   base has changed since last test execution.',
+                    required=True)
 
 PARSER.add_argument(
                     '-o', '--output-path',
@@ -80,6 +85,7 @@ PARSER.add_argument(
 
 ARGS = PARSER.parse_args()
 
+MUTATION_TOOL_ROOT = sys.path[0]
 PROJECT_ROOT = ARGS.project_root
 CONFIG_PATH = ARGS.config_path
 OUTPUT_PATH = ARGS.output_path
@@ -90,6 +96,8 @@ util.trace.info('Paths:\n' + \
                 ' * CONFIG_PATH  ' + CONFIG_PATH + '\n' + \
                 ' * OUTPUT_PATH  ' + OUTPUT_PATH)
 
+import shutil
+
 #===============================================================================
 # Main function
 #===============================================================================
@@ -97,6 +105,24 @@ def main():
     '''
     Entry point
     '''
+
+    #===========================================================================
+    # Copy style.css to output path
+    # TODO: This should be done in a process module
+    #===========================================================================
+    util.trace.info('Copying style.css to output path')
+
+    os.chdir(MUTATION_TOOL_ROOT)
+
+    try:
+        os.makedirs(OUTPUT_PATH)
+    except OSError:
+        if not os.path.isdir(OUTPUT_PATH):
+            raise
+
+    shutil.copy('css/style.css', OUTPUT_PATH)
+    #===========================================================================
+
     os.chdir(CONFIG_PATH)
 
     # Init random number generator

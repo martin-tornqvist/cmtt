@@ -1,3 +1,6 @@
+# Ignore output directory for example project tests
+example_project/mutation_output
+
 # Backups
 *~
 
