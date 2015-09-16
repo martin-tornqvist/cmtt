@@ -145,7 +145,7 @@ def main():
 
     src_file_path = src_list.pop()
 
-    util.trace.empty_lines()
+    util.trace.empty_line()
 
     util.trace.info('Current source file to mutate: ' + src_file_path)
 
@@ -166,7 +166,7 @@ def main():
     # Iterate over each line in the source file
     for cur_line_nr in range(0, nr_lines):
 
-        util.trace.empty_lines()
+        util.trace.empty_line()
 
         util.trace.info('Original line (' + \
                         str(cur_line_nr + 1) + '/' + str(nr_lines) + '):\n' + \

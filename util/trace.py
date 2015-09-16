@@ -8,12 +8,12 @@ def info(text):
     '''TBD'''
     print '>>> ' + text
 
-def empty_lines():
+def empty_line():
     '''TBD'''
-    print '\n'
+    print ''
 
 def exit_error(text):
     '''TBD'''
-    empty_lines()
+    empty_line()
     print 'ERROR: ' + text
     sys.exit()

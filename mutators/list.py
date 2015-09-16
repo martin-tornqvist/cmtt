@@ -5,6 +5,7 @@ If mutators are added, removed or renamed.
 
 import mutators.boolean
 import mutators.arithmetic
+import mutators.compound_assign
 
 def get():
     '''
@@ -15,5 +16,6 @@ def get():
 
     ret.append(mutators.boolean.mutate)
     ret.append(mutators.arithmetic.mutate)
+    ret.append(mutators.compound_assign.mutate)
 
     return ret
