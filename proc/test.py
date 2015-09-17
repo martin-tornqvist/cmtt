@@ -4,10 +4,10 @@ TBD
 
 import subprocess
 
-from proc import paths
+from proc import cfg_filenames
 
 def run():
     '''
     TBD
     '''
-    subprocess.call(['./' + paths.TEST_EXECUTION_HOOK_NAME])
+    subprocess.call(['./' + cfg_filenames.TEST_EXECUTION_HOOK_NAME])

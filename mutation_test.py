@@ -15,88 +15,16 @@ Main module
 import sys
 import os
 import random
-import argparse
+import shutil
+
+import proc.args
+import proc.cfg_filenames
+import proc.seq_init
+import proc.test
 
 import mutators.list
 
-import proc.paths
-import proc.test
-
 import util.trace
-
-#===============================================================================
-# Arguments
-#===============================================================================
-PARSER = argparse.ArgumentParser(
-                    description='A Mutation testing tool for C.\n'
-                    '\n'
-                    'See the example_project directory for an example on how\n'
-                    'to set up the tool.',
-                    formatter_class=argparse.RawTextHelpFormatter)
-
-PARSER.add_argument(
-                    '-p', '--project-root',
-                    help=
-                    'Absolute path to the root directory of your project\n'
-                    '(e.g. a Git repo).',
-                    required=True)
-
-PARSER.add_argument(
-                    '-c', '--config-path',
-                    help=
-                    'Absolute path to a directory containing user provided\n'
-                    'hook scripts and configuration files. When any user\n'
-                    'provided script is executed, the current directory is\n'
-                    'changed to the configuration directory.\n'
-                    '\n'
-                    'The configuration directory must contain the\n'
-                    'following files:\n'
-                    '\n'
-                    + '* ' + proc.paths.TEST_EXECUTION_HOOK_NAME + '\n'
-                    '   A script (bash/python/etc) building and running\n'
-                    '   your test suite (e.g. by Make commands).\n'
-                    '\n'
-                    + '* ' + proc.paths.SRC_LIST_NAME + '\n'
-                    '   A text file containing a list of source files to \n'
-                    '   mutate (absolute paths, or relative to project root).\n'
-                    '\n'
-                    + '* ' + proc.paths.TEST_SRC_LIST_NAME + '\n'
-                    '   A text file containing a list of test source files\n'
-                    '   (absolute paths, or relative to project root). These\n'
-                    '   files are only read to determine if the source code\n'
-                    '   base has changed since last test execution.',
-                    required=True)
-
-PARSER.add_argument(
-                    '-o', '--output-path',
-                    help=
-                    'Absolute path to a directory where reports will be\n'
-                    'written. This is also used as a working directory to\n'
-                    'store temporary files.',
-                    required=True)
-
-PARSER.add_argument(
-                    '-s', '--rng-seed',
-                    help=
-                    'Optional custom seed for the random number generator.\n'
-                    'Can be useful to deterministically recreate test runs.\n'
-                    'If not specified, the current date and time is used.',
-                    required=False)
-
-ARGS = PARSER.parse_args()
-
-MUTATION_TOOL_ROOT = sys.path[0]
-PROJECT_ROOT = ARGS.project_root
-CONFIG_PATH = ARGS.config_path
-OUTPUT_PATH = ARGS.output_path
-RNG_SEED = ARGS.rng_seed
-
-util.trace.info('Paths:\n' + \
-                ' * PROJECT_ROOT ' + PROJECT_ROOT + '\n' + \
-                ' * CONFIG_PATH  ' + CONFIG_PATH + '\n' + \
-                ' * OUTPUT_PATH  ' + OUTPUT_PATH)
-
-import shutil
 
 #===============================================================================
 # Main function
@@ -105,6 +33,24 @@ def main():
     '''
     Entry point
     '''
+    #===========================================================================
+    # Parse program arguments and set up global variables (e.g. paths)
+    #===========================================================================
+    proc.args.parse()
+
+    # Ensure that the output directory exists. Abort the whole execution if it
+    # doesn't exist and cannot be created (e.g. we have a permission problem)
+    # be created)
+    try:
+        os.makedirs(proc.args.OUTPUT_PATH)
+    except OSError:
+        if not os.path.isdir(proc.args.OUTPUT_PATH):
+            raise
+
+    #===========================================================================
+    # Setup sequence (check if source code base has changed, etc)
+    #===========================================================================
+    proc.seq_init.run()
 
     #===========================================================================
     # Copy style.css to output path
@@ -112,28 +58,22 @@ def main():
     #===========================================================================
     util.trace.info('Copying style.css to output path')
 
-    os.chdir(MUTATION_TOOL_ROOT)
+    os.chdir(proc.args.MUTATION_TOOL_ROOT)
 
-    try:
-        os.makedirs(OUTPUT_PATH)
-    except OSError:
-        if not os.path.isdir(OUTPUT_PATH):
-            raise
-
-    shutil.copy('css/style.css', OUTPUT_PATH)
+    shutil.copy('css/style.css', proc.args.OUTPUT_PATH)
     #===========================================================================
 
-    os.chdir(CONFIG_PATH)
+    os.chdir(proc.args.CONFIG_PATH)
 
     # Init random number generator
     rng = random.Random()
 
-    if RNG_SEED:
-        util.trace.info('Using custom seed: ' + RNG_SEED)
-        rng.seed(RNG_SEED)
+    if proc.args.RNG_SEED:
+        util.trace.info('Using custom seed: ' + proc.args.RNG_SEED)
+        rng.seed(proc.args.RNG_SEED)
 
     # Read the source mutator_list file into a list, and shuffle the list
-    with open(proc.paths.SRC_LIST_NAME) as src_list_f:
+    with open(proc.cfg_filenames.SRC_LIST_NAME) as src_list_f:
         src_list = src_list_f.read().splitlines()
 
     rng.shuffle(src_list)
@@ -141,7 +81,7 @@ def main():
     # Get a list of mutators
     mutator_list = mutators.list.get()
 
-    os.chdir(PROJECT_ROOT)
+    os.chdir(proc.args.PROJECT_ROOT)
 
     src_file_path = src_list.pop()
 
@@ -192,14 +132,15 @@ def main():
                 with open(src_file_path, 'w') as src_f:
                     src_f.write('\n'.join(src_file_working_lines))
 
-                os.chdir(CONFIG_PATH)
+                os.chdir(proc.args.CONFIG_PATH)
 
                 util.trace.info('Running user test execution hook script at:' +
-                    CONFIG_PATH + '/' + proc.paths.TEST_EXECUTION_HOOK_NAME)
+                    proc.args.CONFIG_PATH + '/' +
+                    proc.cfg_filenames.TEST_EXECUTION_HOOK_NAME)
 
                 proc.test.run()
 
-                os.chdir(PROJECT_ROOT)
+                os.chdir(proc.args.PROJECT_ROOT)
 
                 util.trace.info('Restoring source file')
                 with open(src_file_path, 'w') as src_f:
