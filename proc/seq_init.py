@@ -5,34 +5,13 @@ TBD
 import os
 import hashlib
 
-import util.trace
-
 from proc import args
 from proc import cfg_filenames
-
-def _get_file_sha1(path):
-    '''
-    TBD
-    '''
-    blocksize = 4096
-
-    hasher = hashlib.sha1()
-
-    with open(path, 'rb') as file_to_calc:
-        buf = file_to_calc.read(blocksize)
-
-        while len(buf) > 0:
-            hasher.update(buf)
-            buf = file_to_calc.read(blocksize)
-
-    return hasher.hexdigest()
-
 
 def run():
     '''
     TBD
     '''
-
     #===========================================================================
     # Get source base sha1 list
     #===========================================================================
@@ -60,10 +39,27 @@ def run():
     # TODO: Continue with sequence init
     #===========================================================================
     # TODO: Debug stuff, to be removed...
-    os.chdir(args.OUTPUT_PATH)
+#     os.chdir(args.OUTPUT_PATH)
+#
+#     with open('src-base-sha1', 'w') as sha1_list_f:
+#         for sha1 in sha1_list:
+#             sha1_list_f.write('%s\n' % sha1)
+#
+#     util.trace.exit_error('Bye!')
 
-    with open('src-base-sha1', 'w') as sha1_list_f:
-        for sha1 in sha1_list:
-            sha1_list_f.write('%s\n' % sha1)
+def _get_file_sha1(path):
+    '''
+    TBD
+    '''
+    blocksize = 4096
 
-    util.trace.exit_error('Bye!')
+    hasher = hashlib.sha1()
+
+    with open(path, 'rb') as file_to_calc:
+        buf = file_to_calc.read(blocksize)
+
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = file_to_calc.read(blocksize)
+
+    return hasher.hexdigest()

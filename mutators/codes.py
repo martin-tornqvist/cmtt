@@ -1,5 +1,5 @@
 '''
-Status codes for mutators
+Status codes returned by mutators
 '''
 
 # Mutators should return this when attempting to apply mutations
