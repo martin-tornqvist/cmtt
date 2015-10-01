@@ -18,7 +18,7 @@ import random
 import shutil
 
 import proc.args
-import proc.cfg_filenames
+import proc.filenames
 import proc.seq_init
 import proc.mutation_testing
 
@@ -71,7 +71,7 @@ def main():
         rng.seed(proc.args.RNG_SEED)
 
     # Read the source source list file into a list, and shuffle the list
-    with open(proc.cfg_filenames.SRC_LIST_NAME) as src_list_f:
+    with open(proc.filenames.SRC_LIST_NAME) as src_list_f:
         src_list = src_list_f.read().splitlines()
 
     # Filter out empty lines

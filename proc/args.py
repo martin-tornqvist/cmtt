@@ -5,7 +5,7 @@ TBD
 import sys
 import argparse
 
-from proc import cfg_filenames
+from proc import filenames
 import util.trace
 
 #===============================================================================
@@ -49,15 +49,15 @@ def parse():
                     'The configuration directory must contain the\n'
                     'following files:\n'
                     '\n'
-                    + '* ' + cfg_filenames.TEST_EXECUTION_HOOK_NAME + '\n'
+                    + '* ' + filenames.TEST_EXECUTION_HOOK_NAME + '\n'
                     '   A script (bash/python/etc) building and running\n'
                     '   your test suite (e.g. by Make commands).\n'
                     '\n'
-                    + '* ' + cfg_filenames.SRC_LIST_NAME + '\n'
+                    + '* ' + filenames.SRC_LIST_NAME + '\n'
                     '   A text file containing a list of source files to \n'
                     '   mutate (absolute paths, or relative to project root).\n'
                     '\n'
-                    + '* ' + cfg_filenames.TEST_SRC_LIST_NAME + '\n'
+                    + '* ' + filenames.TEST_SRC_LIST_NAME + '\n'
                     '   A text file containing a list of test source files\n'
                     '   (absolute paths, or relative to project root). These\n'
                     '   files are only read to determine if the source code\n'
