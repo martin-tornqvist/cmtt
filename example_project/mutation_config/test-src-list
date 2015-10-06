@@ -1,4 +1,0 @@
-tests/src/framework.c
-tests/src/tests.c
-
-tests/include/framework.h

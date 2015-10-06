@@ -5,7 +5,7 @@ TBD
 import sys
 import argparse
 
-from proc import filenames
+import process.filenames
 import util.trace
 
 #===============================================================================
@@ -49,19 +49,22 @@ def parse():
                     'The configuration directory must contain the\n'
                     'following files:\n'
                     '\n'
-                    + '* ' + filenames.TEST_EXECUTION_HOOK_NAME + '\n'
+                    + '* ' + process.filenames.EXECUTE_TESTS_HOOK_NAME + '\n'
                     '   A script (bash/python/etc) building and running\n'
                     '   your test suite (e.g. by Make commands).\n'
                     '\n'
-                    + '* ' + filenames.SRC_LIST_NAME + '\n'
+                    + '* ' + process.filenames.MUTATION_FILES_NAME + '\n'
                     '   A text file containing a list of source files to \n'
                     '   mutate (absolute paths, or relative to project root).\n'
                     '\n'
-                    + '* ' + filenames.TEST_SRC_LIST_NAME + '\n'
-                    '   A text file containing a list of test source files\n'
-                    '   (absolute paths, or relative to project root). These\n'
-                    '   files are only read to determine if the source code\n'
-                    '   base has changed since last test execution.',
+                    + '* ' + process.filenames.SRC_BASE_NAME + '\n'
+                    '   A text file containing a list of files constituting\n'
+                    '   your source code base (absolute paths, or relative\n'
+                    '   to project root). This can (or should) include both\n'
+                    '   your code under test, and your test code. These\n'
+                    '   files are read to determine if the source code base \n'
+                    '   has changed since the last test execution (which\n'
+                    '   will trigger a new test sequence).',
                     required=True)
 
     parser.add_argument(

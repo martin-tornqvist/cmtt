@@ -7,8 +7,8 @@ import hashlib
 import re
 import datetime
 
-from proc import args
-from proc import filenames
+from process import args
+from process import filenames
 
 import util.trace
 
@@ -96,11 +96,8 @@ def _get_src_base_sha1_list():
     '''
     os.chdir(args.CONFIG_PATH)
 
-    with open(filenames.SRC_LIST_NAME, 'r') as src_list_f:
+    with open(filenames.SRC_BASE_NAME, 'r') as src_list_f:
         src_base_list = src_list_f.read().splitlines()
-
-    with open(filenames.TEST_SRC_LIST_NAME, 'r') as test_src_list_f:
-        src_base_list += test_src_list_f.read().splitlines()
 
     # Filter out empty lines
     src_base_list = [src_f for src_f in src_base_list if src_f != '']

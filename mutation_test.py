@@ -17,10 +17,10 @@ import os
 import random
 import shutil
 
-import proc.args
-import proc.filenames
-import proc.seq_init
-import proc.mutation_testing
+import process.args
+import process.filenames
+import process.seq_init
+import process.mutation_testing
 
 import util.trace
 
@@ -34,21 +34,21 @@ def main():
     #===========================================================================
     # Parse program arguments and set up global variables (e.g. paths)
     #===========================================================================
-    proc.args.parse()
+    process.args.parse()
 
     # Ensure that the output directory exists. Abort the whole execution if it
     # doesn't exist and cannot be created (e.g. we have a permission problem)
     # be created)
     try:
-        os.makedirs(proc.args.OUTPUT_PATH)
+        os.makedirs(process.args.OUTPUT_PATH)
     except OSError:
-        if not os.path.isdir(proc.args.OUTPUT_PATH):
+        if not os.path.isdir(process.args.OUTPUT_PATH):
             raise
 
     #===========================================================================
     # Setup sequence (check if source code base has changed, etc)
     #===========================================================================
-    proc.seq_init.run()
+    process.seq_init.run()
 
     #===========================================================================
     # Copy style.css to output path
@@ -56,22 +56,22 @@ def main():
     #===========================================================================
     util.trace.info('Copying style.css to output path')
 
-    os.chdir(proc.args.MUTATION_TOOL_ROOT)
+    os.chdir(process.args.MUTATION_TOOL_ROOT)
 
-    shutil.copy('css/style.css', proc.args.OUTPUT_PATH)
+    shutil.copy('css/style.css', process.args.OUTPUT_PATH)
     #===========================================================================
 
-    os.chdir(proc.args.CONFIG_PATH)
+    os.chdir(process.args.CONFIG_PATH)
 
     # Init random number generator
     rng = random.Random()
 
-    if proc.args.RNG_SEED:
-        util.trace.info('Using custom seed: ' + proc.args.RNG_SEED)
-        rng.seed(proc.args.RNG_SEED)
+    if process.args.RNG_SEED:
+        util.trace.info('Using custom seed: ' + process.args.RNG_SEED)
+        rng.seed(process.args.RNG_SEED)
 
     # Read the source source list file into a list, and shuffle the list
-    with open(proc.filenames.SRC_LIST_NAME) as src_list_f:
+    with open(process.filenames.MUTATION_FILES_NAME) as src_list_f:
         src_list = src_list_f.read().splitlines()
 
     # Filter out empty lines
@@ -80,7 +80,7 @@ def main():
     rng.shuffle(src_list)
 
     # TODO: Check mutation testing result code
-    proc.mutation_testing.run(src_list, rng)
+    process.mutation_testing.run(src_list, rng)
 
 if __name__ == "__main__":
     sys.exit(main())

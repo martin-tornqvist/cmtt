@@ -8,9 +8,9 @@ import mutators.list
 
 import util.trace
 
-from proc import codes
-from proc import args
-from proc import test_suite_execution
+from process import codes
+from process import args
+from process import test_suite_execution
 
 def run(src_file_path_list, rng):
     '''
