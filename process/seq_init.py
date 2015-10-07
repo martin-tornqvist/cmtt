@@ -6,9 +6,9 @@ import os
 import hashlib
 import re
 import datetime
+import shutil
 
-from process import args
-from process import filenames
+from process import args, filenames, test_suite_execution
 
 import util.trace
 
@@ -45,7 +45,28 @@ def _start_new_seq(dir_name, src_base_sha1_list):
     os.chdir(dir_name)
 
     with open(filenames.SRC_BASE_SHA1, 'w') as sha1_f:
-        sha1_f.write('\n'.join(src_base_sha1_list))
+        for sha1 in src_base_sha1_list:
+            sha1_f.write("%s\n" % sha1)
+
+    # Perform a test execution with unmodified source code, to get a clean
+    # ("golden") test output that we can compare against.
+    test_suite_execution.run()
+
+    os.chdir(args.OUTPUT_PATH)
+
+    clean_result_orig_path = args.OUTPUT_PATH + '/' + filenames.TEST_RESULTS
+
+    clean_result_dst_path = args.OUTPUT_PATH + '/' + dir_name + '/' + \
+                            filenames.CLEAN_TEST_RESULTS
+
+    shutil.copy(clean_result_orig_path, clean_result_dst_path)
+
+    # Verify that the file was copied to the sequence directory
+    if os.path.isfile(clean_result_dst_path) == False:
+        util.trace.exit_error('Could not copy test results to: ' +
+                              clean_result_dst_path)
+
+    os.remove(clean_result_orig_path)
 
     return dir_name
 
@@ -126,8 +147,8 @@ def _get_ongoing_seq_dir():
 
     # Find sub directories of the form:
     # "year-month-day-minute-second-microsecond"
-    # Note:                       YYYY- MM- DD . mm . ss . ffffff-
-    ongoing_seq_dir_pattern = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.....-$'
+    # Note:                       YYYY- MM- DD . hh . mm . ss-
+    ongoing_seq_dir_pattern = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-$'
 
     cur_seq_dir = ''
 
@@ -173,4 +194,4 @@ def _get_cur_date_str():
     '''
     TBD
     '''
-    return datetime.datetime.today().strftime("%Y-%m-%d.%M.%S.%f")
+    return datetime.datetime.today().strftime("%Y-%m-%d.%H.%M.%S")

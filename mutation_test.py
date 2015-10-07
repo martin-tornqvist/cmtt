@@ -46,7 +46,10 @@ def main():
             raise
 
     #===========================================================================
-    # Setup sequence (check if source code base has changed, etc)
+    # Start a new sequence (if the code base has changed, or if this is the
+    # first execution ever), or continue an existing. If a new sequence is
+    # started, we run an "unmutated" test execution on a clean code base
+    # to get results to compare against (a "golden file").
     #===========================================================================
     process.seq_init.run()
 
@@ -79,6 +82,9 @@ def main():
 
     rng.shuffle(src_list)
 
+    #===========================================================================
+    # Run mutation testing until finished or timeout
+    #===========================================================================
     # TODO: Check mutation testing result code
     process.mutation_testing.run(src_list, rng)
 

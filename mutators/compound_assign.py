@@ -2,8 +2,7 @@
 Boolean operator mutator
 '''
 
-from mutators import common
-from mutators import codes
+from mutators import common, codes
 
 def mutate(lines, line_nr, rng):
     '''
