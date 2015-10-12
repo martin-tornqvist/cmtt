@@ -47,20 +47,16 @@ def _mutation_test_src_f(origin_lines, path, mutator_list, rng):
 
     util.trace.empty_line()
 
-    util.trace.info('Running mutation testing on source file: ' + path + \
+    util.trace.info('Running mutation testing on source file: ' + path +
                     ' (' + str(nr_lines) + ' lines)')
 
     # Iterate over each line in the source file
     for line_nr in range(0, nr_lines):
 
-        util.trace.empty_line()
+        # TODO: Ignore lines inside comments
 
-        util.trace.info('Original line (' + \
-                        str(line_nr + 1) + \
-                        '/' + str(nr_lines) + '):\n' + \
-                        origin_lines[line_nr])
-
-        # TODO: Ignore empty lines, or lines inside comments
+        if not origin_lines[line_nr]:
+            continue
 
         # Run mutation tests on this line in the source file
         # Try each mutator on the current line
@@ -73,14 +69,21 @@ def _mutation_test_src_f(origin_lines, path, mutator_list, rng):
 
             if mutate_result == mutators.codes.MUTATE_OK:
 
-                util.trace.info('Line was modified by ' + mutator.__module__ +
-                                ':\n' + \
+                util.trace.empty_line()
+
+                util.trace.info('Line ' + str(line_nr + 1) + '/' +
+                                str(nr_lines) + ':\n' +
+                                origin_lines[line_nr])
+
+                util.trace.info('Was modified by ' +
+                                mutator.__module__ + ':\n' +
                                 working_lines[line_nr])
 
                 os.chdir(args.PROJECT_ROOT)
 
                 backup_path = path + '.backup'
 
+                util.trace.empty_line()
                 util.trace.info('Creating backup of source file')
 
                 shutil.copy(path, backup_path)
@@ -100,6 +103,7 @@ def _mutation_test_src_f(origin_lines, path, mutator_list, rng):
 
                 os.chdir(args.PROJECT_ROOT)
 
+                util.trace.empty_line()
                 util.trace.info('Restoring source file')
 
                 os.remove(path)

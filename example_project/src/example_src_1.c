@@ -2,14 +2,25 @@
 
 #include <stdio.h>
 
-static void empty_function()
+static int useless_function()
 {
-    /* Nothing done here */
+    int div = 3;
+
+    int make_it_crash = 0;
+
+    if (make_it_crash == true)
+    {
+        div = 0;
+    }
+
+    int out = 9 / div;
+
+    return out;
 }
 
 int average(int x, int y)
 {
-    empty_function();
+    useless_function();
 
     /* No effect on outcome, correct sum calculated below anyway */
     /* Redundant "or" condition */

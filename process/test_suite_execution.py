@@ -15,12 +15,14 @@ def run():
     '''
     os.chdir(args.CONFIG_PATH)
 
-    util.trace.info('Running user test execution hook script at:' +
-        args.CONFIG_PATH + '/' +
-        filenames.EXECUTE_TESTS_HOOK_NAME)
+    util.trace.empty_line()
+    util.trace.info('Running user test execution hook script at: ' +
+                    args.CONFIG_PATH + '/' +
+                    filenames.EXECUTE_TESTS_HOOK_NAME)
 
     subprocess.call(['./' + filenames.EXECUTE_TESTS_HOOK_NAME])
 
+    util.trace.empty_line()
     util.trace.info('Finished user test execution')
 
     test_result_path = args.OUTPUT_PATH + '/' + filenames.TEST_RESULTS
