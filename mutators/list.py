@@ -3,9 +3,7 @@ This module contains a list of all mutators. This list must be kept up to date
 If mutators are added, removed or renamed.
 '''
 
-import mutators.boolean
-import mutators.arithmetic
-import mutators.compound_assign
+from mutators import boolean, arithmetic, compound_assign, comparison
 
 def get():
     '''
@@ -14,8 +12,9 @@ def get():
 
     ret = []
 
-    ret.append(mutators.boolean.mutate)
-    ret.append(mutators.arithmetic.mutate)
-    ret.append(mutators.compound_assign.mutate)
+    ret.append(boolean.mutate)
+    ret.append(arithmetic.mutate)
+    ret.append(compound_assign.mutate)
+    ret.append(comparison.mutate)
 
     return ret
