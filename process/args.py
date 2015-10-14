@@ -5,17 +5,9 @@ TBD
 import sys
 import argparse
 
-import process.filenames
-import util.trace
+from process import vars
 
-#===============================================================================
-# Global variables
-#===============================================================================
-MUTATION_TOOL_ROOT = ''
-PROJECT_ROOT = ''
-CONFIG_PATH = ''
-OUTPUT_PATH = ''
-RNG_SEED = ''
+import util.trace
 
 #===============================================================================
 # Argument parsing
@@ -32,39 +24,28 @@ def parse():
                     formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument(
-                    '-p', '--project-root',
-                    help=
-                    'Absolute path to the root directory of your project\n'
-                    '(e.g. a Git repo).',
-                    required=True)
-
-    parser.add_argument(
                     '-c', '--config-path',
                     help=
                     'Absolute path to a directory containing user provided\n'
-                    'hook scripts and configuration files. When any user\n'
-                    'provided script is executed, the current directory is\n'
-                    'changed to the configuration directory.\n'
+                    'hook scripts and configuration files. This directory\n'
+                    'must contain the following files:\n'
                     '\n'
-                    'The configuration directory must contain the\n'
-                    'following files:\n'
+                    + '* ' + vars.EXECUTE_TESTS_HOOK_NAME + '\n'
+                    '  A script (bash/python/etc) building and running\n'
+                    '  your test suite (e.g. by Make commands).\n'
                     '\n'
-                    + '* ' + process.filenames.EXECUTE_TESTS_HOOK_NAME + '\n'
-                    '   A script (bash/python/etc) building and running\n'
-                    '   your test suite (e.g. by Make commands).\n'
+                    + '* ' + vars.MUTATION_FILES_NAME + '\n'
+                    '  A text file containing a list of source files to \n'
+                    '  mutate (absolute paths, or relative to project root).\n'
                     '\n'
-                    + '* ' + process.filenames.MUTATION_FILES_NAME + '\n'
-                    '   A text file containing a list of source files to \n'
-                    '   mutate (absolute paths, or relative to project root).\n'
-                    '\n'
-                    + '* ' + process.filenames.SRC_BASE_NAME + '\n'
-                    '   A text file containing a list of files constituting\n'
-                    '   your source code base (absolute paths, or relative\n'
-                    '   to project root). This can (or should) include both\n'
-                    '   your code under test, and your test code. These\n'
-                    '   files are read to determine if the source code base \n'
-                    '   has changed since the last test execution (which\n'
-                    '   will trigger a new test sequence).',
+                    + '* ' + vars.SRC_BASE_NAME + '\n'
+                    '  A text file containing a list of files constituting\n'
+                    '  your source code base (absolute paths, or relative\n'
+                    '  to project root). This can (or should) include both\n'
+                    '  your code under test, and your test code. These\n'
+                    '  files are read to determine if the source code base\n'
+                    '  has changed since the last test execution (which\n'
+                    '  will trigger a new test sequence).',
                     required=True)
 
     parser.add_argument(
@@ -76,6 +57,13 @@ def parse():
                     required=True)
 
     parser.add_argument(
+                    '-p', '--project-root',
+                    help=
+                    'Absolute path to the root directory of your project\n'
+                    '(e.g. a Git repo).',
+                    required=True)
+
+    parser.add_argument(
                     '-s', '--rng-seed',
                     help=
                     'Optional custom seed for the random number generator.\n'
@@ -83,24 +71,48 @@ def parse():
                     'If not specified, the current date and time is used.',
                     required=False)
 
+    parser.add_argument(
+                    '-T', '--global-timeout',
+                    help=
+                    'How many seconds the tool should be kept running (the\n'
+                    'number of possible mutations is practically endless, so\n'
+                    'you will want to abort execution at some point, and\n'
+                    'perhaps resume testing another day.',
+                    required=False)
+
     args = parser.parse_args()
 
-    global MUTATION_TOOL_ROOT
-    MUTATION_TOOL_ROOT = sys.path[0]
+    #===========================================================================
+    # Required arguments
+    #===========================================================================
+    vars.MUTATION_TOOL_ROOT = sys.path[0]
 
-    global PROJECT_ROOT
-    PROJECT_ROOT = args.project_root
+    vars.PROJECT_ROOT = args.project_root
 
-    global CONFIG_PATH
-    CONFIG_PATH = args.config_path
+    vars.CONFIG_PATH = args.config_path
 
-    global OUTPUT_PATH
-    OUTPUT_PATH = args.output_path
+    vars.OUTPUT_PATH = args.output_path
 
-    global RNG_SEED
-    RNG_SEED = args.rng_seed
+    #===========================================================================
+    # Optional arguments
+    #===========================================================================
+    if args.rng_seed is not None:
+        vars.RNG_SEED = args.rng_seed
 
+    if args.global_timeout is not None:
+        vars.GLOBAL_TIMEOUT = float(args.global_timeout)
+
+    #===========================================================================
+    # Print argument info/confirmation
+    #===========================================================================
     util.trace.info('Paths:\n' + \
-                    ' * PROJECT_ROOT ' + PROJECT_ROOT + '\n' + \
-                    ' * CONFIG_PATH  ' + CONFIG_PATH + '\n' + \
-                    ' * OUTPUT_PATH  ' + OUTPUT_PATH)
+                    ' * PROJECT_ROOT ' + vars.PROJECT_ROOT + '\n' + \
+                    ' * CONFIG_PATH  ' + vars.CONFIG_PATH + '\n' + \
+                    ' * OUTPUT_PATH  ' + vars.OUTPUT_PATH)
+
+    if vars.RNG_SEED:
+        util.trace.info('Custom RNG seed: ' + vars.RNG_SEED)
+    else:
+        util.trace.info('Using current date as RNG seed')
+
+    util.trace.info('Global timeout: ' + str(vars.GLOBAL_TIMEOUT) + 's')

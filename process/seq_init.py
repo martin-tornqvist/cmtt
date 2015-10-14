@@ -8,7 +8,7 @@ import re
 import datetime
 import shutil
 
-from process import args, filenames, test_suite_execution
+from process import args, vars, test_suite_execution
 
 import util.trace
 
@@ -36,7 +36,7 @@ def _start_new_seq(dir_name, src_base_sha1_list):
     '''
     TBD
     '''
-    os.chdir(args.OUTPUT_PATH)
+    os.chdir(vars.OUTPUT_PATH)
 
     dir_name = _mk_new_seq_dir()
 
@@ -44,7 +44,7 @@ def _start_new_seq(dir_name, src_base_sha1_list):
 
     os.chdir(dir_name)
 
-    with open(filenames.SRC_BASE_SHA1, 'w') as sha1_f:
+    with open(vars.SRC_BASE_SHA1, 'w') as sha1_f:
         for sha1 in src_base_sha1_list:
             sha1_f.write("%s\n" % sha1)
 
@@ -52,12 +52,12 @@ def _start_new_seq(dir_name, src_base_sha1_list):
     # ("golden") test output that we can compare against.
     test_suite_execution.run()
 
-    os.chdir(args.OUTPUT_PATH)
+    os.chdir(vars.OUTPUT_PATH)
 
-    clean_result_orig_path = args.OUTPUT_PATH + '/' + filenames.TEST_RESULTS
+    clean_result_orig_path = vars.OUTPUT_PATH + '/' + vars.TEST_RESULTS
 
-    clean_result_dst_path = args.OUTPUT_PATH + '/' + dir_name + '/' + \
-                            filenames.CLEAN_TEST_RESULTS
+    clean_result_dst_path = vars.OUTPUT_PATH + '/' + dir_name + '/' + \
+                            vars.CLEAN_TEST_RESULTS
 
     shutil.copy(clean_result_orig_path, clean_result_dst_path)
 
@@ -79,12 +79,12 @@ def _verify_ongoing_seq(dir_name, src_base_sha1_list):
     if dir_name:
         os.chdir(dir_name)
 
-        if not os.path.isfile(filenames.SRC_BASE_SHA1):
-            util.trace.exit_error('File "' + filenames.SRC_BASE_SHA1 + '" ' + \
+        if not os.path.isfile(vars.SRC_BASE_SHA1):
+            util.trace.exit_error('File "' + vars.SRC_BASE_SHA1 + '" ' + \
                                   'missing from sequence directory: ' + \
                                   dir_name)
 
-        with open(filenames.SRC_BASE_SHA1, 'r') as sha1_f:
+        with open(vars.SRC_BASE_SHA1, 'r') as sha1_f:
             sha1_f_content = sha1_f.read()
 
         seq_sha1_list = sha1_f_content.splitlines()
@@ -100,7 +100,7 @@ def _verify_ongoing_seq(dir_name, src_base_sha1_list):
             util.trace.info('Renaming ' + dir_name + ' to ' +
                             new_dir_name + ' (finalized)')
 
-            os.chdir(args.OUTPUT_PATH)
+            os.chdir(vars.OUTPUT_PATH)
 
             os.rename(dir_name, new_dir_name)
 
@@ -115,15 +115,15 @@ def _get_src_base_sha1_list():
     '''
     TBD
     '''
-    os.chdir(args.CONFIG_PATH)
+    os.chdir(vars.CONFIG_PATH)
 
-    with open(filenames.SRC_BASE_NAME, 'r') as src_list_f:
+    with open(vars.SRC_BASE_NAME, 'r') as src_list_f:
         src_base_list = src_list_f.read().splitlines()
 
     # Filter out empty lines
     src_base_list = [src_f for src_f in src_base_list if src_f != '']
 
-    os.chdir(args.PROJECT_ROOT)
+    os.chdir(vars.PROJECT_ROOT)
 
     src_base_sha1_list = []
 
@@ -141,7 +141,7 @@ def _get_ongoing_seq_dir():
     '''
     TBD
     '''
-    os.chdir(args.OUTPUT_PATH)
+    os.chdir(vars.OUTPUT_PATH)
 
     subdirs = os.listdir('.')
 

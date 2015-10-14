@@ -6,6 +6,7 @@ import sys
 
 def info(text):
     '''TBD'''
+    empty_line()
     print '>>> ' + text
 
 def empty_line():

@@ -10,4 +10,5 @@ echo "-------------------------------------------------------------------------"
 ./mutation_test.py \
     --project-root=$example_path \
     --config-path=$example_path/mutation_config \
-    --output-path=$example_path/mutation_output
+    --output-path=$example_path/mutation_output \
+    --global-timeout=5

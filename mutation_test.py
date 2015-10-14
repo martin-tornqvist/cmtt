@@ -16,9 +16,10 @@ import sys
 import os
 import random
 import shutil
+import time
 
 import process.args
-import process.filenames
+import process.vars
 import process.seq_init
 import process.mutation_testing
 
@@ -40,10 +41,15 @@ def main():
     # doesn't exist and cannot be created (e.g. we have a permission problem)
     # be created)
     try:
-        os.makedirs(process.args.OUTPUT_PATH)
+        os.makedirs(process.vars.OUTPUT_PATH)
     except OSError:
-        if not os.path.isdir(process.args.OUTPUT_PATH):
+        if not os.path.isdir(process.vars.OUTPUT_PATH):
             raise
+
+    #===========================================================================
+    # Get tool start time (for global timeout functionality)
+    #===========================================================================
+    process.vars.TOOL_START_TIME = time.time()
 
     #===========================================================================
     # Start a new sequence (if the code base has changed, or if this is the
@@ -59,28 +65,26 @@ def main():
     #===========================================================================
     util.trace.info('Copying style.css to output path')
 
-    os.chdir(process.args.MUTATION_TOOL_ROOT)
+    os.chdir(process.vars.MUTATION_TOOL_ROOT)
 
-    shutil.copy('css/style.css', process.args.OUTPUT_PATH)
+    shutil.copy('css/style.css', process.vars.OUTPUT_PATH)
     #===========================================================================
 
-    os.chdir(process.args.CONFIG_PATH)
+    os.chdir(process.vars.CONFIG_PATH)
 
     # Init random number generator
     rng = random.Random()
 
-    if process.args.RNG_SEED:
-        util.trace.info('Using custom seed: ' + process.args.RNG_SEED)
-        rng.seed(process.args.RNG_SEED)
+    if process.vars.RNG_SEED:
+        util.trace.info('Using custom seed: ' + process.vars.RNG_SEED)
+        rng.seed(process.vars.RNG_SEED)
 
-    # Read the source source list file into a list, and shuffle the list
-    with open(process.filenames.MUTATION_FILES_NAME) as src_list_f:
+    # Read the source source list file into a list
+    with open(process.vars.MUTATION_FILES_NAME) as src_list_f:
         src_list = src_list_f.read().splitlines()
 
     # Filter out empty lines
     src_list = [src_f for src_f in src_list if src_f != '']
-
-    rng.shuffle(src_list)
 
     #===========================================================================
     # Run mutation testing until finished or timeout
