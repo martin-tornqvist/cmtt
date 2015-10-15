@@ -31,10 +31,16 @@ int average(int x, int y)
 
     int sum = x + y;
 
+    /* Pointless operations */
     int scale = 10;
-
-    sum *= scale; /* Pointless operations */
-    sum /= scale; /* ...                  */
+    ++scale;
+    --scale;
+    sum *= scale;
+    sum /= scale;
+    scale++;
+    scale--;
+    ++scale;
+    --scale;
 
     return sum / 2;
 }
@@ -44,6 +50,14 @@ int lowest(int x, int y, int z)
     /* Redundant "and" condition */
     if (x < y && true)
     {
+        /* Pointless... */
+        x -= 10;
+
+        for (int i = 0; i < 10; ++i)
+        {
+            ++x;
+        }
+
         return x < z ? x : z;
     }
     else if (y <= x) /* Pointless comparison */
@@ -51,5 +65,5 @@ int lowest(int x, int y, int z)
         return y < z ? y : z;
     }
 
-    return x < y ? x : y; /* Dead code */
+    return x < y ? x : y; /* This is dead code */
 }
