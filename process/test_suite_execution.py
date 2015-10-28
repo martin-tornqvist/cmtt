@@ -5,7 +5,7 @@ TBD
 import subprocess
 import os
 
-from process import args, vars
+from process import vars
 
 import util.trace
 
@@ -19,7 +19,7 @@ def run():
                     vars.CONFIG_PATH + '/' +
                     vars.EXECUTE_TESTS_HOOK_NAME)
 
-    subprocess.call(['./' + vars.EXECUTE_TESTS_HOOK_NAME])
+    subprocess.call(['./' + vars.EXECUTE_TESTS_HOOK_NAME], shell=True)
 
     util.trace.info('Finished user test execution')
 

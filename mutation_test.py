@@ -20,7 +20,7 @@ import time
 
 import process.args
 import process.vars
-import process.seq_init
+import process.seq
 import process.mutation_testing
 
 import util.trace
@@ -57,7 +57,7 @@ def main():
     # started, we run an "unmutated" test execution on a clean code base
     # to get results to compare against (a "golden file").
     #===========================================================================
-    process.seq_init.run()
+    process.seq.init()
 
     #===========================================================================
     # Copy style.css to output path

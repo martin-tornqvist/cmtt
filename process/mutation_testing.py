@@ -9,8 +9,9 @@ import time
 import mutators.list
 
 import util.trace
+import util.diff
 
-from process import codes, vars, test_suite_execution
+from process import codes, vars, test_suite_execution, seq
 
 def run(src_file_path_list, rng):
     '''
@@ -19,7 +20,6 @@ def run(src_file_path_list, rng):
     os.chdir(vars.PROJECT_ROOT)
 
     # Run mutation tests on the file paths until the global timeout finishes
-    # TODO: Implement global timeout
     while True:
         util.trace.info('Starting new mutation test loop over source file list')
 
@@ -54,19 +54,18 @@ def run(src_file_path_list, rng):
                 # TODO: Ignore lines inside comments
 
                 # Run mutation tests on the source file until done
-                _mutation_test_src_line(origin_lines, line_nr, path, rng)
+                _mut_test_src_line(origin_lines, line_nr, path, rng)
 
                 time_now = time.time()
 
                 if time_now > (vars.TOOL_START_TIME + vars.GLOBAL_TIMEOUT):
                     util.trace.info('Global timeout hit (' +
-                                    str(vars.GLOBAL_TIMEOUT) +
-                                    's), bye!')
+                                    str(vars.GLOBAL_TIMEOUT) + 's), bye!')
                     return
 
     return codes.DONE
 
-def _mutation_test_src_line(origin_lines, line_nr, path, rng):
+def _mut_test_src_line(origin_lines, line_nr, path, rng):
     '''
     TBD
     '''
@@ -108,13 +107,22 @@ def _mutation_test_src_line(origin_lines, line_nr, path, rng):
                 for line in working_lines:
                     src_f.write("%s\n" % line)
 
-            # TODO: Make a diff from the original file to the modified file,
-            #       only run tests if diff has not been applied before.
+            patch_path = vars.OUTPUT_PATH + '/mutation_patch'
 
-            test_suite_execution.run()
+            util.diff.gen_patch(backup_path, path, patch_path)
 
-            # TODO: Verify test execution, and if mutation was not covered,
-            #       store the diff permanently.
+            if seq.is_patch_applied_cur_seq(patch_path):
+                util.trace.info('Mutation already applied previously in this '
+                                'sequence - skipping')
+            else:
+                # Mutation has not been applied before in this sequence
+
+                seq.mk_mut_serial_dir()
+
+                # Move the patch to the mutation serial folder
+                shutil.move(patch_path, vars.CUR_MUTATION_DIR)
+
+                test_suite_execution.run()
 
             os.chdir(vars.PROJECT_ROOT)
 

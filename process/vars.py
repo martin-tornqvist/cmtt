@@ -17,6 +17,17 @@ CLEAN_TEST_RESULTS = 'test-results-clean'
 TEST_RESULTS = 'test-results'
 
 #===============================================================================
+# Current sequence directory
+#===============================================================================
+CUR_SEQ_DIR = ''
+
+#===============================================================================
+# Serial numbered directory under the sequence directory to store output
+# specific for the current mutation (e.g. a patch and test result)
+#===============================================================================
+CUR_MUTATION_DIR = ''
+
+#===============================================================================
 # User arguments
 #===============================================================================
 MUTATION_TOOL_ROOT = ''
@@ -25,7 +36,7 @@ CONFIG_PATH = ''
 OUTPUT_PATH = ''
 RNG_SEED = ''
 
-# Default global timeout is two hours
+# Default global timeout in seconds (two hours)
 GLOBAL_TIMEOUT = 7200
 
 #===============================================================================
