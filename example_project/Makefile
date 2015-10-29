@@ -1,7 +1,7 @@
 mk_dir       := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 executable   := $(mk_dir)/target/test
-test_log     := $(mk_dir)/target/test_results.log
+test_log     := $(mk_dir)/target/test_results
 cc           := gcc
 flags        := -Wall -Wextra -pedantic -std=c99 -DTEST_LOG="$(test_log)"
 

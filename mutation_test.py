@@ -19,11 +19,11 @@ import shutil
 import time
 
 import process.args
-import process.vars
+import process.settings
 import process.seq
 import process.mutation_testing
 
-import util.trace
+import util.log
 
 #===============================================================================
 # Main function
@@ -41,15 +41,15 @@ def main():
     # doesn't exist and cannot be created (e.g. we have a permission problem)
     # be created)
     try:
-        os.makedirs(process.vars.OUTPUT_PATH)
+        os.makedirs(process.settings.OUTPUT_PATH)
     except OSError:
-        if not os.path.isdir(process.vars.OUTPUT_PATH):
+        if not os.path.isdir(process.settings.OUTPUT_PATH):
             raise
 
     #===========================================================================
     # Get tool start time (for global timeout functionality)
     #===========================================================================
-    process.vars.TOOL_START_TIME = time.time()
+    process.settings.TOOL_START_TIME = time.time()
 
     #===========================================================================
     # Start a new sequence (if the code base has changed, or if this is the
@@ -63,24 +63,24 @@ def main():
     # Copy style.css to output path
     # TODO: This should be done in a process module
     #===========================================================================
-    util.trace.info('Copying style.css to output path')
+    util.log.info('Copying style.css to output path')
 
-    os.chdir(process.vars.MUTATION_TOOL_ROOT)
+    os.chdir(process.settings.MUTATION_TOOL_ROOT)
 
-    shutil.copy('css/style.css', process.vars.OUTPUT_PATH)
+    shutil.copy('css/style.css', process.settings.OUTPUT_PATH)
     #===========================================================================
 
-    os.chdir(process.vars.CONFIG_PATH)
+    os.chdir(process.settings.CONFIG_PATH)
 
     # Init random number generator
     rng = random.Random()
 
-    if process.vars.RNG_SEED:
-        util.trace.info('Using custom seed: ' + process.vars.RNG_SEED)
-        rng.seed(process.vars.RNG_SEED)
+    if process.settings.RNG_SEED:
+        util.log.info('Using custom seed: ' + process.settings.RNG_SEED)
+        rng.seed(process.settings.RNG_SEED)
 
     # Read the source source list file into a list
-    with open(process.vars.MUTATION_FILES_NAME) as src_list_f:
+    with open(process.settings.MUTATION_FILES_NAME) as src_list_f:
         src_list = src_list_f.read().splitlines()
 
     # Filter out empty lines

@@ -8,20 +8,21 @@ import time
 
 import mutators.list
 
-import util.trace
+import util.log
 import util.diff
 
-from process import codes, vars, test_suite_execution, seq
+from process import codes, test_suite_execution, seq
+from process import settings
 
 def run(src_file_path_list, rng):
     '''
     TBD
     '''
-    os.chdir(vars.PROJECT_ROOT)
+    os.chdir(settings.PROJECT_ROOT)
 
     # Run mutation tests on the file paths until the global timeout finishes
     while True:
-        util.trace.info('Starting new mutation test loop over source file list')
+        util.log.info('Starting new mutation test loop over source file list')
 
         # Shuffle the source file list
         rng.shuffle(src_file_path_list)
@@ -32,7 +33,7 @@ def run(src_file_path_list, rng):
 
             # Verify that the file exists
             if os.path.isfile(path) == False:
-                util.trace.exit_error('Could not find source file: ' + path)
+                util.log.exit_error('Missing source file: ' + path)
 
             # Read the source file
             with open(path, 'r') as src_f:
@@ -41,7 +42,7 @@ def run(src_file_path_list, rng):
 
             nr_lines = len(origin_lines)
 
-            util.trace.info('Running mutation testing on source file: ' + path +
+            util.log.info('Running mutation testing on source file: ' + path +
                             ' (' + str(nr_lines) + ' lines)')
 
             # Iterate over each line in the source file
@@ -58,9 +59,9 @@ def run(src_file_path_list, rng):
 
                 time_now = time.time()
 
-                if time_now > (vars.TOOL_START_TIME + vars.GLOBAL_TIMEOUT):
-                    util.trace.info('Global timeout hit (' +
-                                    str(vars.GLOBAL_TIMEOUT) + 's), bye!')
+                if time_now > (settings.TOOL_START_TIME + settings.GLOBAL_TIMEOUT):
+                    util.log.info('Global timeout hit (' +
+                                    str(settings.GLOBAL_TIMEOUT) + 's), bye!')
                     return
 
     return codes.DONE
@@ -86,20 +87,19 @@ def _mut_test_src_line(origin_lines, line_nr, path, rng):
 
         if mutate_result == mutators.codes.MUTATE_OK:
 
-            util.trace.info('Line ' + str(line_nr + 1) + '/' +
+            util.log.info('Line ' + str(line_nr + 1) + '/' +
                             str(nr_lines) + ':\n' +
                             origin_lines[line_nr])
 
-            util.trace.info('Was modified by ' +
+            util.log.info('Was modified by ' +
                             mutator.__module__ + ':\n' +
                             working_lines[line_nr])
 
-            os.chdir(vars.PROJECT_ROOT)
+            os.chdir(settings.PROJECT_ROOT)
 
             backup_path = path + '.backup'
 
-            util.trace.info('Creating backup of source file')
-
+            # Make backup of source file
             shutil.copy(path, backup_path)
 
             # Overwrite the file with the modified lines
@@ -107,12 +107,12 @@ def _mut_test_src_line(origin_lines, line_nr, path, rng):
                 for line in working_lines:
                     src_f.write("%s\n" % line)
 
-            patch_path = vars.OUTPUT_PATH + '/mutation_patch'
+            patch_path = settings.OUTPUT_PATH + '/' + settings.MUT_PATCH_NAME
 
             util.diff.gen_patch(backup_path, path, patch_path)
 
-            if seq.is_patch_applied_cur_seq(patch_path):
-                util.trace.info('Mutation already applied previously in this '
+            if seq.is_patch_applied_cur_seq(os.path.abspath(path), patch_path):
+                util.log.info('Mutation already applied previously in this '
                                 'sequence - skipping')
             else:
                 # Mutation has not been applied before in this sequence
@@ -120,13 +120,13 @@ def _mut_test_src_line(origin_lines, line_nr, path, rng):
                 seq.mk_mut_serial_dir()
 
                 # Move the patch to the mutation serial folder
-                shutil.move(patch_path, vars.CUR_MUTATION_DIR)
+                shutil.move(patch_path, settings.CUR_MUTATION_DIR)
 
                 test_suite_execution.run()
 
-            os.chdir(vars.PROJECT_ROOT)
+            os.chdir(settings.PROJECT_ROOT)
 
-            util.trace.info('Restoring source file')
+            # Restore source file
 
             os.remove(path)
 

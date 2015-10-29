@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# A simple example on how to set up an "execute-tests" hook
+# A simple example on how to set up an "execute_tests" hook
 
 # Go to the example project root directory
 # (You probably shouldn't use a relative path in a real project though)
@@ -12,7 +12,7 @@ make
 # Run tests
 target/test
 
-# Move the test output to "test-results" in root of the mutation_output folder
+# Move the test output to "test_results" in the root of the mutation_output folder
 # (which is where the tool expects to find it after calling this test hook).
 #
 # NOTE: In a real project, this file could instead for example be concatenated from
@@ -21,4 +21,4 @@ target/test
 #       Time stamps and other such "moving parts" must be stripped from the file,
 #       otherwise two tests executions will always seem to differ when compared!
 #
-mv target/test_results.log mutation_output/test-results
+mv target/test_results mutation_output/

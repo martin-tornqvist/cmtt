@@ -5,9 +5,9 @@ TBD
 import sys
 import argparse
 
-from process import vars
+from process import settings
 
-import util.trace
+import util.log
 
 #===============================================================================
 # Argument parsing
@@ -30,15 +30,15 @@ def parse():
                     'hook scripts and configuration files. This directory\n'
                     'must contain the following files:\n'
                     '\n'
-                    + '* ' + vars.EXECUTE_TESTS_HOOK_NAME + '\n'
+                    + '* ' + settings.EXECUTE_TESTS_HOOK_NAME + '\n'
                     '  A script (bash/python/etc) building and running\n'
                     '  your test suite (e.g. by Make commands).\n'
                     '\n'
-                    + '* ' + vars.MUTATION_FILES_NAME + '\n'
+                    + '* ' + settings.MUTATION_FILES_NAME + '\n'
                     '  A text file containing a list of source files to \n'
                     '  mutate (absolute paths, or relative to project root).\n'
                     '\n'
-                    + '* ' + vars.SRC_BASE_NAME + '\n'
+                    + '* ' + settings.SRC_BASE_NAME + '\n'
                     '  A text file containing a list of files constituting\n'
                     '  your source code base (absolute paths, or relative\n'
                     '  to project root). This can (or should) include both\n'
@@ -85,34 +85,34 @@ def parse():
     #===========================================================================
     # Required arguments
     #===========================================================================
-    vars.MUTATION_TOOL_ROOT = sys.path[0]
+    settings.MUTATION_TOOL_ROOT = sys.path[0]
 
-    vars.PROJECT_ROOT = args.project_root
+    settings.PROJECT_ROOT = args.project_root
 
-    vars.CONFIG_PATH = args.config_path
+    settings.CONFIG_PATH = args.config_path
 
-    vars.OUTPUT_PATH = args.output_path
+    settings.OUTPUT_PATH = args.output_path
 
     #===========================================================================
     # Optional arguments
     #===========================================================================
     if args.rng_seed is not None:
-        vars.RNG_SEED = args.rng_seed
+        settings.RNG_SEED = args.rng_seed
 
     if args.global_timeout is not None:
-        vars.GLOBAL_TIMEOUT = float(args.global_timeout)
+        settings.GLOBAL_TIMEOUT = float(args.global_timeout)
 
     #===========================================================================
     # Print argument info/confirmation
     #===========================================================================
-    util.trace.info('Paths:\n' + \
-                    ' * PROJECT_ROOT ' + vars.PROJECT_ROOT + '\n' + \
-                    ' * CONFIG_PATH  ' + vars.CONFIG_PATH + '\n' + \
-                    ' * OUTPUT_PATH  ' + vars.OUTPUT_PATH)
+    util.log.info('Paths:\n' + \
+                    ' * PROJECT_ROOT ' + settings.PROJECT_ROOT + '\n' + \
+                    ' * CONFIG_PATH  ' + settings.CONFIG_PATH + '\n' + \
+                    ' * OUTPUT_PATH  ' + settings.OUTPUT_PATH)
 
-    if vars.RNG_SEED:
-        util.trace.info('Custom RNG seed: ' + vars.RNG_SEED)
+    if settings.RNG_SEED:
+        util.log.info('Custom RNG seed: ' + settings.RNG_SEED)
     else:
-        util.trace.info('Using current date as RNG seed')
+        util.log.info('Using current date as RNG seed')
 
-    util.trace.info('Global timeout: ' + str(vars.GLOBAL_TIMEOUT) + 's')
+    util.log.info('Global timeout: ' + str(settings.GLOBAL_TIMEOUT) + 's')

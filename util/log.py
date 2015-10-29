@@ -3,6 +3,7 @@ TBD
 '''
 
 import sys
+import traceback
 
 def info(text):
     '''TBD'''
@@ -16,5 +17,12 @@ def empty_line():
 def exit_error(text):
     '''TBD'''
     empty_line()
-    print 'ERROR: ' + text
+
+    print '#'
+    print '# ERROR: ' + text
+    print '#'
+    print ''
+
+    print traceback.print_stack()
+
     sys.exit()

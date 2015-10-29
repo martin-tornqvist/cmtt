@@ -5,14 +5,14 @@ Functionality for retrieving checksum of a file
 import os
 import hashlib
 
-from util import trace
+from util import log
 
 def get_file_sha1(path):
     '''
     Returns sha1 of the given file
     '''
     if not os.path.isfile(path):
-        trace.exit_error('File missing when trying to read sha1: ' + path)
+        log.exit_error('Missing file: ' + path)
 
     blocksize = 4096
 

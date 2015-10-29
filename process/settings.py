@@ -5,16 +5,17 @@ Global paths and variables
 #===============================================================================
 # Config directory
 #===============================================================================
-EXECUTE_TESTS_HOOK_NAME = 'execute-tests'
-MUTATION_FILES_NAME = 'mutation-files'
-SRC_BASE_NAME = 'src-base'
+EXECUTE_TESTS_HOOK_NAME = 'execute_tests'
+MUTATION_FILES_NAME = 'mutation_files'
+SRC_BASE_NAME = 'src_base'
 
 #===============================================================================
 # Output directory
 #===============================================================================
-SRC_BASE_SHA1 = 'src-base-sha1'
-CLEAN_TEST_RESULTS = 'test-results-clean'
-TEST_RESULTS = 'test-results'
+SRC_BASE_SHA1_NAME = 'src_base_sha1'
+CLEAN_TEST_RESULTS_NAME = 'test_results_clean'
+TEST_RESULTS_NAME = 'test_results'
+MUT_PATCH_NAME = 'mutation_patch'
 
 #===============================================================================
 # Current sequence directory

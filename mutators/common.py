@@ -11,6 +11,9 @@ def strip_escapes(line):
     return line.replace('\\', '')
 
 def match_list(re_str, line):
+    '''
+    TBD
+    '''
     pattern = re.compile(re_str)
 
     match_iterator = re.finditer(pattern, line)
