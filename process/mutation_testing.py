@@ -11,7 +11,8 @@ import mutators.list
 import util.log
 import util.diff
 
-from process import codes, test_suite_execution, seq
+from process import codes, seq
+from process import user_tests
 from process import settings
 
 def run(src_file_path_list, rng):
@@ -62,7 +63,8 @@ def run(src_file_path_list, rng):
                 if time_now > (settings.TOOL_START_TIME + settings.GLOBAL_TIMEOUT):
                     util.log.info('Global timeout hit (' +
                                     str(settings.GLOBAL_TIMEOUT) + 's), bye!')
-                    return
+
+                    return codes.GLOBAL_TIMEOUT_EXCEEDED
 
     return codes.DONE
 
@@ -113,7 +115,7 @@ def _mut_test_src_line(origin_lines, line_nr, path, rng):
 
             if seq.is_patch_applied_cur_seq(os.path.abspath(path), patch_path):
                 util.log.info('Mutation already applied previously in this '
-                                'sequence - skipping')
+                              'sequence - skipping')
             else:
                 # Mutation has not been applied before in this sequence
 
@@ -122,7 +124,7 @@ def _mut_test_src_line(origin_lines, line_nr, path, rng):
                 # Move the patch to the mutation serial folder
                 shutil.move(patch_path, settings.CUR_MUTATION_DIR)
 
-                test_suite_execution.run()
+                user_tests.run()
 
             os.chdir(settings.PROJECT_ROOT)
 

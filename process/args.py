@@ -14,10 +14,10 @@ import util.log
 #===============================================================================
 def parse():
     '''
-    TBD
+    Reads and stores user parameters
     '''
     parser = argparse.ArgumentParser(
-                    description='A Mutation testing tool for C.\n'
+                    description='CMTT - C Mutation Test Tool.\n'
                     '\n'
                     'See the example_project directory for an example on how\n'
                     'to set up the tool.',

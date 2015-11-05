@@ -1,0 +1,80 @@
+@startuml
+
+'=============================================================================
+' Settings
+'=============================================================================
+scale max 700 * 700
+
+skinparam style strictuml
+skinparam monochrome true
+
+'=============================================================================
+' Participants
+'=============================================================================
+participant cmtt 			as "cmtt.py"
+participant mut_testing		as "process.mutation_testing.py"
+participant mutators
+participant seq				as "process.seq.py"
+participant user_tests		as "process.user_tests.py"
+
+'=============================================================================
+' Actions
+'=============================================================================
+activate cmtt
+
+cmtt -> mut_testing : \trun()\t\t\t\t\t
+activate mut_testing
+
+loop Forever
+	mut_testing -> mut_testing : Shuffle source file list
+	activate mut_testing
+	deactivate mut_testing
+	
+	loop For each line in each source file
+	
+		|||
+
+		opt Global timeout exceeded
+			note over mut_testing
+				Abort all testing and exit
+			end note
+		end
+		
+		|||
+
+		loop For each mutator
+			mut_testing -> mutators : Try to mutate line\nwith current mutator
+			
+			activate 	mutators
+			deactivate	mutators
+			
+			opt Mutation can be applied\nAND\nhas not been applied before in this sequence
+				mut_testing -> mut_testing : Replace original file\nwith mutated version
+				activate 	mut_testing
+				deactivate	mut_testing
+				
+				mut_testing -> seq : Make serial numbered\nmutation directory
+				activate 	seq
+				deactivate	seq
+				
+				mut_testing -> mut_testing : Store patch in the\nmutation directory
+				activate 	mut_testing
+				deactivate	mut_testing
+				
+				mut_testing -> user_tests : Execute user tests
+				activate 	user_tests
+				deactivate	user_tests
+				
+				mut_testing -> mut_testing : Restore original file
+				activate 	mut_testing
+				deactivate	mut_testing
+			end
+		end
+	end
+end
+
+deactivate mut_testing
+
+deactivate cmtt
+
+@enduml

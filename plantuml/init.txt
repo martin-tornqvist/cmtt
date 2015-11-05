@@ -1,0 +1,67 @@
+@startuml
+
+'=============================================================================
+' Settings
+'=============================================================================
+scale max 700 * 700
+
+skinparam style strictuml
+skinparam monochrome true
+
+'=============================================================================
+' Participants
+'=============================================================================
+participant cmtt 			as "cmtt.py"
+participant args 			as "process.args.py"
+participant seq				as "process.seq.py"
+
+'=============================================================================
+' Actions
+'=============================================================================
+activate cmtt
+
+cmtt -> args : Parse user arguments
+activate args
+deactivate args
+
+cmtt -> seq : Initialize
+activate seq
+
+alt Unfinished sequence directory found\nAND\nSource base sha1 matches
+	seq -> seq : Use previous sequence directory
+	activate	seq
+	deactivate	seq
+else else
+	opt Unfinished sequence directory found
+		seq -> seq : Finalize previous sequence directory\nby adding end date suffix
+		activate	seq
+		deactivate	seq
+	end
+	
+	seq -> seq : Create new sequence directory,\nnamed only with start date prefix
+	activate 	seq
+	deactivate	seq
+	
+	seq -> seq : Write current source files sha1 to\nsequence directory
+	activate 	seq
+	deactivate	seq
+end
+deactivate seq
+
+alt Custom seed provided
+	cmtt -> cmtt : Init RNG with custom seed
+	activate 	cmtt
+	deactivate	cmtt
+else else
+	cmtt -> cmtt : Init RNG with date
+	activate 	cmtt
+	deactivate	cmtt
+end
+
+cmtt -> cmtt : Read list of source files\nto mutate
+activate 	cmtt
+deactivate	cmtt
+
+deactivate cmtt
+
+@enduml

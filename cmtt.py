@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-Main module
+Main module for CMTT (C Mutation Test Tool)
 '''
 
 #

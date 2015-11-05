@@ -10,7 +10,7 @@ import re
 import datetime
 import shutil
 
-from process import test_suite_execution
+from process import user_tests
 from process import settings
 
 import util.log
@@ -92,7 +92,6 @@ def mk_mut_serial_dir():
     serial_nr = -1
 
     for mut_dir in mut_dirs:
-
         if mut_dir.isdigit():
             serial_nr = int(mut_dir)
 
@@ -157,7 +156,7 @@ def _start_new_seq(src_base_sha1_list):
 
     # Perform a test execution with unmodified source code, to get a clean
     # ("golden") test output that we can compare against.
-    test_suite_execution.run()
+    user_tests.run()
 
     os.chdir(settings.OUTPUT_PATH)
 
