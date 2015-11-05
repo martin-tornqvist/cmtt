@@ -15,6 +15,16 @@ def run():
     '''
     os.chdir(settings.CONFIG_PATH)
 
+    test_results_orig_path = \
+        settings.OUTPUT_PATH + '/' + settings.TEST_RESULTS_NAME
+
+    # Verify that no test results exists in the output directory prior to
+    # running user tests
+    if os.path.isfile(test_results_orig_path):
+        util.log.exit_error('User test results exists in output directory '
+                            'prior to running user tests: ' +
+                            test_results_orig_path)
+
     util.log.info('Running user test execution hook script at: ' +
                     settings.CONFIG_PATH + '/' +
                     settings.EXECUTE_TESTS_HOOK_NAME)
@@ -22,9 +32,3 @@ def run():
     subprocess.call(['./' + settings.EXECUTE_TESTS_HOOK_NAME], shell=True)
 
     util.log.info('Finished user test execution')
-
-    test_result_path = settings.OUTPUT_PATH + '/' + settings.TEST_RESULTS_NAME
-
-    # Verify that the test results file exists in the output directory
-    if os.path.isfile(test_result_path) == False:
-        util.log.exit_error('Missing test results file: ' + test_result_path)

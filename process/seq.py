@@ -160,22 +160,22 @@ def _start_new_seq(src_base_sha1_list):
 
     os.chdir(settings.OUTPUT_PATH)
 
-    clean_result_orig_path = \
+    pure_result_orig_path = \
         settings.OUTPUT_PATH + '/' + \
         settings.TEST_RESULTS_NAME
 
-    clean_result_dst_path = \
+    pure_result_dst_path = \
         settings.CUR_SEQ_DIR + '/' + \
-        settings.CLEAN_TEST_RESULTS_NAME
+        settings.PURE_TEST_RESULTS_NAME
 
-    shutil.copy(clean_result_orig_path, clean_result_dst_path)
+    shutil.copy(pure_result_orig_path, pure_result_dst_path)
 
     # Verify that the file was copied to the sequence directory
-    if os.path.isfile(clean_result_dst_path) == False:
+    if os.path.isfile(pure_result_dst_path) == False:
         util.log.exit_error('Could not copy test results to: ' +
-                            clean_result_dst_path)
+                            pure_result_dst_path)
 
-    os.remove(clean_result_orig_path)
+    os.remove(pure_result_orig_path)
 
 def _verify_ongoing_seq(src_base_sha1_list):
     '''

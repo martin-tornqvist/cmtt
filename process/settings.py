@@ -13,7 +13,7 @@ SRC_BASE_NAME = 'src_base'
 # Output directory
 #===============================================================================
 SRC_BASE_SHA1_NAME = 'src_base_sha1'
-CLEAN_TEST_RESULTS_NAME = 'test_results_clean'
+PURE_TEST_RESULTS_NAME = 'pure_test_results'
 TEST_RESULTS_NAME = 'test_results'
 MUT_PATCH_NAME = 'mutation_patch'
 

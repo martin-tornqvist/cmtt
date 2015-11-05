@@ -126,6 +126,16 @@ def _mut_test_src_line(origin_lines, line_nr, path, rng):
 
                 user_tests.run()
 
+                results_orig_path = \
+                    settings.OUTPUT_PATH + '/' + settings.TEST_RESULTS_NAME
+
+                if os.path.isfile(results_orig_path):
+                    # User test results found, move to mutation directory
+                    shutil.move(results_orig_path, settings.CUR_MUTATION_DIR)
+                else:
+                    util.log.info('No test results found, assuming user tests '
+                                  'terminated abnormally (e.g. SEGFAULT)')
+
             os.chdir(settings.PROJECT_ROOT)
 
             # Restore source file
