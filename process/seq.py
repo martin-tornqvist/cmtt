@@ -23,10 +23,10 @@ def init():
     '''
     src_base_sha1_list = _get_src_base_sha1_list()
 
-    cur_seq_dir_name = _get_ongoing_seq_dir_name()
+    cur_seq_dir_path = get_ongoing_seq_dir_name()
 
-    if cur_seq_dir_name:
-        settings.CUR_SEQ_DIR = settings.OUTPUT_PATH + '/' + cur_seq_dir_name
+    if cur_seq_dir_path:
+        settings.CUR_SEQ_DIR = cur_seq_dir_path
         settings.CUR_SEQ_DIR = _verify_ongoing_seq(src_base_sha1_list)
 
     if settings.CUR_SEQ_DIR:
@@ -43,6 +43,52 @@ def init():
     if not os.path.isabs(settings.CUR_SEQ_DIR):
         util.log.exit_error('Sequence directory not absolute: ' +
                               settings.CUR_SEQ_DIR)
+
+def get_ongoing_seq_dir_name():
+    '''
+    Searches for an ongoing sequence directory (i.e. a directory named with a
+    start time prefix and no end time suffix, found in the output directory)
+    '''
+    os.chdir(settings.OUTPUT_PATH)
+
+    subdirs = os.listdir('.')
+
+    # Find sub directories of the form:
+    # "year-month-day-minute-second-microsecond"
+    # Note:                       YYYY- MM- DD . hh . mm . ss-
+    ongoing_seq_dir_pattern = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-$'
+
+    ongoing_dir_path = ''
+
+    # Search for a sub directory matching the ongoing sequence pattern
+    for subdir in subdirs:
+        if os.path.isdir(subdir) and re.match(ongoing_seq_dir_pattern, subdir):
+            ongoing_dir_path = settings.OUTPUT_PATH + '/' + subdir
+            break
+
+    return ongoing_dir_path
+
+def get_seq_dirs():
+    '''
+    TBD
+    '''
+    os.chdir(settings.OUTPUT_PATH)
+
+    subdirs = os.listdir('.')
+
+    # Find sub directories starting with:
+    # "year-month-day-minute-second-microsecond"
+    # Note:                       YYYY- MM- DD . hh . mm . ss-
+    seq_dir_pattern = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-$.*'
+
+    sub_dir_paths = []
+
+    # Search for sub directories matching the sequence pattern
+    for subdir in subdirs:
+        if os.path.isdir(subdir) and re.match(seq_dir_pattern, subdir):
+            sub_dir_paths.append(settings.OUTPUT_PATH + '/' + subdir)
+
+    return sub_dir_paths
 
 def is_patch_applied_cur_seq(file_path, patch_path):
     '''
@@ -245,29 +291,6 @@ def _get_src_base_sha1_list():
         util.log.exit_error('Failed to read sha1 list for source base')
 
     return src_base_sha1_list
-
-def _get_ongoing_seq_dir_name():
-    '''
-    TBD
-    '''
-    os.chdir(settings.OUTPUT_PATH)
-
-    subdirs = os.listdir('.')
-
-    # Find sub directories of the form:
-    # "year-month-day-minute-second-microsecond"
-    # Note:                       YYYY- MM- DD . hh . mm . ss-
-    ongoing_seq_dir_pattern = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-$'
-
-    cur_dir_name = ''
-
-    # Search for a sub directory matching the ongoing sequence pattern
-    for subdir in subdirs:
-        if os.path.isdir(subdir) and re.match(ongoing_seq_dir_pattern, subdir):
-            cur_dir_name = subdir
-            break
-
-    return cur_dir_name
 
 def _mk_new_seq_dir():
     '''

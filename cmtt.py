@@ -15,13 +15,13 @@ Main module for CMTT (C Mutation Test Tool)
 import sys
 import os
 import random
-import shutil
 import time
 
 import process.args
 import process.settings
 import process.seq
 import process.mutation_testing
+import process.report
 
 import util.log
 
@@ -37,9 +37,10 @@ def main():
     #===========================================================================
     process.args.parse()
 
+    #===========================================================================
     # Ensure that the output directory exists. Abort the whole execution if it
     # doesn't exist and cannot be created (e.g. we have a permission problem)
-    # be created)
+    #===========================================================================
     try:
         os.makedirs(process.settings.OUTPUT_PATH)
     except OSError:
@@ -47,9 +48,16 @@ def main():
             raise
 
     #===========================================================================
-    # Get tool start time (for global timeout functionality)
+    # Tool start time (used e.g. for global timeout functionality)
     #===========================================================================
     process.settings.TOOL_START_TIME = time.time()
+
+    #===========================================================================
+    # If report flag is set by user, just generate a html report and exit
+    #===========================================================================
+    if process.settings.GEN_REPORTS:
+        process.report.run()
+        return
 
     #===========================================================================
     # Start a new sequence (if the code base has changed, or if this is the
@@ -58,17 +66,6 @@ def main():
     # to get results to compare against (a "golden file").
     #===========================================================================
     process.seq.init()
-
-    #===========================================================================
-    # Copy style.css to output path
-    # TODO: This should be done in a process module
-    #===========================================================================
-    util.log.info('Copying style.css to output path')
-
-    os.chdir(process.settings.MUTATION_TOOL_ROOT)
-
-    shutil.copy('css/style.css', process.settings.OUTPUT_PATH)
-    #===========================================================================
 
     os.chdir(process.settings.CONFIG_PATH)
 

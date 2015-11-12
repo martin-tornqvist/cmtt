@@ -3,6 +3,7 @@ TBD
 '''
 
 import sys
+import os
 import argparse
 
 from process import settings
@@ -80,6 +81,14 @@ def parse():
                     'perhaps resume testing another day.',
                     required=False)
 
+    parser.add_argument(
+                    '-r', '--report',
+                    help=
+                    'Instead of running mutation testing, generate a html\n'
+                    'report in the output directory.',
+                    required=False,
+                    action='store_true')
+
     args = parser.parse_args()
 
     #===========================================================================
@@ -93,6 +102,15 @@ def parse():
 
     settings.OUTPUT_PATH = args.output_path
 
+    if not os.path.isabs(settings.PROJECT_ROOT):
+        util.log.exit_error('Project root path not absolute directory.')
+
+    if not os.path.isabs(settings.CONFIG_PATH):
+        util.log.exit_error('Config root path not absolute directory.')
+
+    if not os.path.isabs(settings.OUTPUT_PATH):
+        util.log.exit_error('Output path not absolute directory.')
+
     #===========================================================================
     # Optional arguments
     #===========================================================================
@@ -102,6 +120,19 @@ def parse():
     if args.global_timeout is not None:
         settings.GLOBAL_TIMEOUT = float(args.global_timeout)
 
+    settings.GEN_REPORTS = args.report
+
+    #===========================================================================
+    # Print mode (mutation/report)
+    #===========================================================================
+    print ''
+    print '================================================='
+    if settings.GEN_REPORTS:
+        print ' Running report mode (no tests will be executed)'
+    else:
+        print ' Running mutation testing mode'
+    print '================================================='
+
     #===========================================================================
     # Print argument info/confirmation
     #===========================================================================
@@ -110,9 +141,13 @@ def parse():
                     ' * CONFIG_PATH  ' + settings.CONFIG_PATH + '\n' + \
                     ' * OUTPUT_PATH  ' + settings.OUTPUT_PATH)
 
-    if settings.RNG_SEED:
-        util.log.info('Custom RNG seed: ' + settings.RNG_SEED)
+    if settings.GEN_REPORTS:
+        util.log.info('Running report mode (no tests will be executed)')
     else:
-        util.log.info('Using current date as RNG seed')
+        # These settings are irrelevant in report mode
+        if settings.RNG_SEED:
+            util.log.info('Custom RNG seed: ' + settings.RNG_SEED)
+        else:
+            util.log.info('Using current date as RNG seed')
 
-    util.log.info('Global timeout: ' + str(settings.GLOBAL_TIMEOUT) + 's')
+        util.log.info('Global timeout: ' + str(settings.GLOBAL_TIMEOUT) + 's')

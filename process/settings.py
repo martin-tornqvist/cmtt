@@ -36,6 +36,7 @@ PROJECT_ROOT = ''
 CONFIG_PATH = ''
 OUTPUT_PATH = ''
 RNG_SEED = ''
+GEN_REPORTS = False
 
 # Default global timeout in seconds (two hours)
 GLOBAL_TIMEOUT = 7200

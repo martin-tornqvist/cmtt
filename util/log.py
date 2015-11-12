@@ -18,11 +18,10 @@ def exit_error(text):
     '''TBD'''
     empty_line()
 
-    print '#'
-    print '# ERROR: ' + text
-    print '#'
+    print ''
+    print 'ERROR: ' + text
     print ''
 
     print traceback.print_stack()
 
-    sys.exit()
+    sys.exit(1)
