@@ -164,9 +164,7 @@ def parse():
                     ' * CONFIG_PATH  ' + settings.CONFIG_PATH + '\n' + \
                     ' * OUTPUT_PATH  ' + settings.OUTPUT_PATH)
 
-    if settings.GEN_REPORTS:
-        util.log.info('Running report mode (no tests will be executed)')
-    else:
+    if not settings.GEN_REPORTS:
         # These settings are irrelevant in report mode
         if settings.RNG_SEED:
             util.log.info('Custom RNG seed: ' + settings.RNG_SEED)
