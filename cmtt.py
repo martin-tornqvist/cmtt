@@ -38,6 +38,13 @@ def main():
     process.args.parse()
 
     #===========================================================================
+    # If dry run flag is set by user, we exit here
+    #===========================================================================
+    if process.settings.DRY_RUN:
+        util.log.info('Everything looks good so far!')
+        return
+
+    #===========================================================================
     # Ensure that the output directory exists. Abort the whole execution if it
     # doesn't exist and cannot be created (e.g. we have a permission problem)
     #===========================================================================

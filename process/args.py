@@ -52,9 +52,8 @@ def parse():
     parser.add_argument(
                     '-o', '--output-path',
                     help=
-                    'Absolute path to a directory where reports will be\n'
-                    'written. This is also used as a working directory to\n'
-                    'store temporary files.',
+                    'Absolute path to a directory where all test artifacts\n'
+                    'and reports will be stored.',
                     required=True)
 
     parser.add_argument(
@@ -75,10 +74,12 @@ def parse():
     parser.add_argument(
                     '-T', '--global-timeout',
                     help=
-                    'How many seconds the tool should be kept running (the\n'
-                    'number of possible mutations is practically endless, so\n'
-                    'you will want to abort execution at some point, and\n'
-                    'perhaps resume testing another day.',
+                    'Global timeout (in seconds). If the tool has been\n'
+                    'running longer than this, no more tests will be\n'
+                    'executed after the current one. (the number of possible\n'
+                    'mutations is typically endless, so you will want to\n'
+                    'abort execution at some point, perhaps to resume testing\n'
+                    'another day.',
                     required=False)
 
     parser.add_argument(
@@ -89,27 +90,25 @@ def parse():
                     required=False,
                     action='store_true')
 
+    parser.add_argument(
+                    '-n', '--dry-run',
+                    help=
+                    'Do not perform any action, just validate arguments and\n'
+                    'configuration. The tool will exit with an error code\n'
+                    'if a problem is found. This mode can be useful for first\n'
+                    'time setup, or when trying configuration changes.',
+                    required=False,
+                    action='store_true')
+
     args = parser.parse_args()
 
     #===========================================================================
     # Required arguments
     #===========================================================================
     settings.MUTATION_TOOL_ROOT = sys.path[0]
-
     settings.PROJECT_ROOT = args.project_root
-
     settings.CONFIG_PATH = args.config_path
-
     settings.OUTPUT_PATH = args.output_path
-
-    if not os.path.isabs(settings.PROJECT_ROOT):
-        util.log.exit_error('Project root path not absolute directory.')
-
-    if not os.path.isabs(settings.CONFIG_PATH):
-        util.log.exit_error('Config root path not absolute directory.')
-
-    if not os.path.isabs(settings.OUTPUT_PATH):
-        util.log.exit_error('Output path not absolute directory.')
 
     #===========================================================================
     # Optional arguments
@@ -120,6 +119,8 @@ def parse():
     if args.global_timeout is not None:
         settings.GLOBAL_TIMEOUT = float(args.global_timeout)
 
+    settings.DRY_RUN = args.dry_run
+
     settings.GEN_REPORTS = args.report
 
     #===========================================================================
@@ -127,11 +128,33 @@ def parse():
     #===========================================================================
     print ''
     print '================================================='
-    if settings.GEN_REPORTS:
+    if settings.DRY_RUN:
+        print ' Dry run mode (no action will be performed)'
+    elif settings.GEN_REPORTS:
         print ' Running report mode (no tests will be executed)'
     else:
         print ' Running mutation testing mode'
     print '================================================='
+
+    #===========================================================================
+    # Validate arguments
+    #===========================================================================
+    if not os.path.isabs(settings.PROJECT_ROOT):
+        util.log.exit_error('Project root path not absolute')
+
+    if not os.path.isabs(settings.CONFIG_PATH):
+        util.log.exit_error('Config root path not absolute')
+
+    if not os.path.isabs(settings.OUTPUT_PATH):
+        util.log.exit_error('Output path not absolute')
+
+    if not os.path.isdir(settings.PROJECT_ROOT):
+        util.log.exit_error('Project root "' + settings.PROJECT_ROOT + '" does '
+                            'not exist, or is not a directory')
+
+    if not os.path.isdir(settings.CONFIG_PATH):
+        util.log.exit_error('Config path "' + settings.CONFIG_PATH + '" does '
+                            'not exist, or is not a directory')
 
     #===========================================================================
     # Print argument info/confirmation
