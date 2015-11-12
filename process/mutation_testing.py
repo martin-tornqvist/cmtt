@@ -11,9 +11,7 @@ import mutators.list
 import util.log
 import util.diff
 
-from process import codes, seq
-from process import user_tests
-from process import settings
+from process import seq, user_tests, settings
 
 def run(src_file_path_list, rng):
     '''
@@ -64,9 +62,7 @@ def run(src_file_path_list, rng):
                     util.log.info('Global timeout hit (' +
                                     str(settings.GLOBAL_TIMEOUT) + 's), bye!')
 
-                    return codes.GLOBAL_TIMEOUT_EXCEEDED
-
-    return codes.DONE
+                    return
 
 def _mut_test_src_line(origin_lines, line_nr, path, rng):
     '''

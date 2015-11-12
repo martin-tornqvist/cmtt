@@ -89,7 +89,6 @@ def main():
     #===========================================================================
     # Run mutation testing until finished or timeout
     #===========================================================================
-    # TODO: Check mutation testing result code
     process.mutation_testing.run(src_list, rng)
 
 if __name__ == "__main__":

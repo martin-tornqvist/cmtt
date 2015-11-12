@@ -48,7 +48,7 @@ else else
 end
 deactivate seq
 
-alt Custom seed provided
+alt Custom seed specified
 	cmtt -> cmtt : Init RNG with custom seed
 	activate 	cmtt
 	deactivate	cmtt
