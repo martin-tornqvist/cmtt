@@ -105,7 +105,7 @@ def parse():
     #===========================================================================
     # Required arguments
     #===========================================================================
-    settings.MUTATION_TOOL_ROOT = sys.path[0]
+    settings.CMTT_ROOT = sys.path[0]
     settings.PROJECT_ROOT = args.project_root
     settings.CONFIG_PATH = args.config_path
     settings.OUTPUT_PATH = args.output_path

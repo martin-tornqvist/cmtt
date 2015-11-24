@@ -1,8 +1,7 @@
 '''
 Functionality for handling sequences. This includes deciding if a new sequence
 should be started (and if so, initialize it), or continue an old one. It also
-includes providing sequence information such as check which diffs has been
-applied before.
+provides sequence information such as check which diffs has been applied before.
 '''
 
 import os
@@ -16,6 +15,24 @@ from process import settings
 import util.log
 import util.checksum
 import util.diff
+
+#===============================================================================
+# Regex patterns for finding sequence directories
+#===============================================================================
+# Any sequence directory:
+# "year-month-day-minute-second-microsecond-*"
+#                     YYYY- MM- DD . hh . mm . ss-*
+SEQ_DIR_PATTERN = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-.*'
+
+# Finalized sequence directory:
+# "year-month-day-minute-second-microsecond-year-*"
+#                              YYYY- MM- DD . hh . mm . ss- YYYY-*
+FINALIZED_SEQ_DIR_PATTERN = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-\d...-.*'
+
+# Ongoing sequence directory:
+# "year-month-day-minute-second-microsecond-"
+#                             YYYY- MM- DD . hh . mm . ss-
+ONGOING_SEQ_DIR_PATTERN = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-$'
 
 def init():
     '''
@@ -53,16 +70,11 @@ def get_ongoing_seq_dir_name():
 
     subdirs = os.listdir('.')
 
-    # Find sub directories of the form:
-    # "year-month-day-minute-second-microsecond"
-    # Note:                       YYYY- MM- DD . hh . mm . ss-
-    ongoing_seq_dir_pattern = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-$'
-
     ongoing_dir_path = ''
 
     # Search for a sub directory matching the ongoing sequence pattern
     for subdir in subdirs:
-        if os.path.isdir(subdir) and re.match(ongoing_seq_dir_pattern, subdir):
+        if os.path.isdir(subdir) and re.match(ONGOING_SEQ_DIR_PATTERN, subdir):
             ongoing_dir_path = settings.OUTPUT_PATH + '/' + subdir
             break
 
@@ -74,21 +86,59 @@ def get_seq_dirs():
     '''
     os.chdir(settings.OUTPUT_PATH)
 
-    subdirs = os.listdir('.')
-
-    # Find sub directories starting with:
-    # "year-month-day-minute-second-microsecond"
-    # Note:                       YYYY- MM- DD . hh . mm . ss-
-    seq_dir_pattern = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-$.*'
+    dir_content = os.listdir('.')
 
     sub_dir_paths = []
 
     # Search for sub directories matching the sequence pattern
-    for subdir in subdirs:
-        if os.path.isdir(subdir) and re.match(seq_dir_pattern, subdir):
-            sub_dir_paths.append(settings.OUTPUT_PATH + '/' + subdir)
+    for entry in dir_content:
+        if os.path.isdir(entry):
+
+            dir_path = settings.OUTPUT_PATH + '/' + entry
+
+            if _is_seq_dir(dir_path):
+                sub_dir_paths.append(dir_path)
 
     return sub_dir_paths
+
+def is_seq_finalized(path):
+    '''
+    Determines if a sequence is finalized by reading the directory name
+    '''
+    if not os.path.isdir(path):
+        util.log.exit_error('Path does not exist, or not a directory: ' +
+                            path)
+
+    dirname = os.path.dirname(path)
+
+    return re.match(FINALIZED_SEQ_DIR_PATTERN, dirname)
+
+def get_seq_start_date(path):
+    '''
+    Determines sequence start date by reading the directory name
+    '''
+    if not os.path.isdir(path):
+        util.log.exit_error('Path does not exist, or not a directory: ' +
+                            path)
+
+    # TODO: Implement (can probably be done with strptime)
+
+
+def get_seq_end_date(path):
+    '''
+    Determines sequence end date by reading the directory name
+    '''
+    if not os.path.isdir(path):
+        util.log.exit_error('Path does not exist, or not a directory: ' +
+                            path)
+
+    if not _is_seq_dir(path):
+        util.log.exit_error('Path is not a sequence directory: ' + path)
+
+    if not is_seq_finalized(path):
+        util.log.exit_error('Sequence directory not finalized: ' + path)
+
+    # TODO: Implement (can probably be done with strptime)
 
 def is_patch_applied_cur_seq(file_path, patch_path):
     '''
@@ -155,6 +205,16 @@ def mk_mut_serial_dir():
 
     util.log.info('Created new mutation serial directory at: ' +
                     settings.CUR_MUTATION_DIR)
+
+def _is_seq_dir(path):
+    '''
+    Determines if path is a sequence directory by reading the directory name
+    '''
+    if not os.path.isdir(path):
+        util.log.exit_error('Path does not exist, or not a directory: ' +
+                            path)
+
+    return re.match(SEQ_DIR_PATTERN, path)
 
 def _get_mut_serial_dirs():
     '''

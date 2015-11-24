@@ -16,6 +16,7 @@ SRC_BASE_SHA1_NAME = 'src_base_sha1'
 PURE_TEST_RESULTS_NAME = 'pure_test_results'
 TEST_RESULTS_NAME = 'test_results'
 MUT_PATCH_NAME = 'mutation_patch'
+HTML_REPORT_NAME = 'report.html'
 
 #===============================================================================
 # Current sequence directory
@@ -31,7 +32,7 @@ CUR_MUTATION_DIR = ''
 #===============================================================================
 # User arguments
 #===============================================================================
-MUTATION_TOOL_ROOT = ''
+CMTT_ROOT = ''
 PROJECT_ROOT = ''
 CONFIG_PATH = ''
 OUTPUT_PATH = ''

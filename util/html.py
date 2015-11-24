@@ -2,10 +2,17 @@
 Utility module for writing html code
 '''
 
+import os
+
+from util import log
+
 def doc_start(title, html_path):
     '''
     TBD
     '''
+    if os.path.isfile(html_path):
+        log.exit_error('html report already exist')
+
     _write('<!DOCTYPE html>', html_path)
     _write('<html>', html_path)
     _write('<head>', html_path)
