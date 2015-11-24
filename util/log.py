@@ -8,20 +8,20 @@ import traceback
 def info(text):
     '''TBD'''
     empty_line()
-    print '>>> ' + text
+    print('>>> ' + text)
 
 def empty_line():
     '''TBD'''
-    print ''
+    print('')
 
 def exit_error(text):
     '''TBD'''
     empty_line()
 
-    print ''
-    print 'ERROR: ' + text
-    print ''
+    print('')
+    print('ERROR: ' + text)
+    print('')
 
-    print traceback.print_stack()
+    print(traceback.print_stack())
 
     sys.exit(1)

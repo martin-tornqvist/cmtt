@@ -8,6 +8,7 @@ import os
 import re
 import datetime
 import shutil
+import functools
 
 from process import user_tests
 from process import settings
@@ -231,13 +232,15 @@ def _get_mut_serial_dirs():
     # Strip non-digit directories (not mutation serial directories)
     mut_dirs = [dir_name for dir_name in mut_dirs if dir_name.isdigit()]
 
+    # Sort the directories numerically
     def numeric_compare(element_1, element_2):
         '''
         No docstring
         '''
         return int(element_1) - int(element_2)
 
-    mut_dirs.sort(cmp=numeric_compare)
+
+    mut_dirs.sort(key=functools.cmp_to_key(numeric_compare))
 
     return mut_dirs
 

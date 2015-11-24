@@ -29,6 +29,7 @@ def run():
                     settings.CONFIG_PATH + '/' +
                     settings.EXECUTE_TESTS_HOOK_NAME)
 
+    # TODO Specify a timeout, and provide a user parameter for this
     subprocess.call(['./' + settings.EXECUTE_TESTS_HOOK_NAME], shell=True)
 
     util.log.info('Finished user test execution')

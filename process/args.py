@@ -126,15 +126,15 @@ def parse():
     #===========================================================================
     # Print mode (mutation/report)
     #===========================================================================
-    print ''
-    print '================================================='
+    print('')
+    print('=================================================')
     if settings.DRY_RUN:
-        print ' Dry run mode (no action will be performed)'
+        print(' Dry run mode (no action will be performed)')
     elif settings.GEN_REPORTS:
-        print ' Running report mode (no tests will be executed)'
+        print(' Running report mode (no tests will be executed)')
     else:
-        print ' Running mutation testing mode'
-    print '================================================='
+        print(' Running mutation testing mode')
+    print('=================================================')
 
     #===========================================================================
     # Validate arguments
