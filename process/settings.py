@@ -40,8 +40,11 @@ RNG_SEED = ''
 DRY_RUN = False
 GEN_REPORTS = False
 
-# Default global timeout in seconds (two hours)
-GLOBAL_TIMEOUT = 7200
+# Test execution subprocess timeout (in seconds)
+TEST_TIMEOUT = 0
+
+# Global timeout (in seconds)
+GLOBAL_TIMEOUT = 0
 
 #===============================================================================
 # Start time of this program

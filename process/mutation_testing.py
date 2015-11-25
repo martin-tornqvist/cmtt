@@ -58,7 +58,9 @@ def run(src_file_path_list, rng):
 
                 time_now = time.time()
 
-                if time_now > (settings.TOOL_START_TIME + settings.GLOBAL_TIMEOUT):
+                deadline = settings.TOOL_START_TIME + settings.GLOBAL_TIMEOUT
+
+                if time_now > deadline:
                     util.log.info('Global timeout hit (' +
                                     str(settings.GLOBAL_TIMEOUT) + 's), bye!')
 
@@ -68,7 +70,6 @@ def _mut_test_src_line(origin_lines, line_nr, path, rng):
     '''
     TBD
     '''
-
     nr_lines = len(origin_lines)
 
     # Get a list of mutators
@@ -130,7 +131,8 @@ def _mut_test_src_line(origin_lines, line_nr, path, rng):
                     shutil.move(results_orig_path, settings.CUR_MUTATION_DIR)
                 else:
                     util.log.info('No test results found, assuming user tests '
-                                  'terminated abnormally (e.g. SEGFAULT)')
+                                  'terminated abnormally (e.g. SEGFAULT or '
+                                  'frozen execution)')
 
             os.chdir(settings.PROJECT_ROOT)
 

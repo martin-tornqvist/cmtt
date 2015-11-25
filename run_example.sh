@@ -10,6 +10,7 @@ example_path=`readlink -e ./example_project`
     --project-root=$example_path \
     --config-path=$example_path/mutation_config \
     --output-path=$example_path/mutation_output \
+    --test-timeout=5 \
     --global-timeout=10
 
 # Mutation testing done, time to generate a report

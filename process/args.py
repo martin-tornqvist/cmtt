@@ -72,6 +72,15 @@ def parse():
                     required=False)
 
     parser.add_argument(
+                    '-t', '--test-timeout',
+                    help=
+                    'Timeout for test executions (in seconds). If a test\n'
+                    'execution subprocess has passed this limit, it is\n'
+                    'assumed to be stuck, and is killed. Default value is\n'
+                    '7200s (two hours).',
+                    default=7200, required=False)
+
+    parser.add_argument(
                     '-T', '--global-timeout',
                     help=
                     'Global timeout (in seconds). If the tool has been\n'
@@ -79,8 +88,8 @@ def parse():
                     'executed after the current one. (the number of possible\n'
                     'mutations is typically endless, so you will want to\n'
                     'abort execution at some point, perhaps to resume testing\n'
-                    'another day.',
-                    required=False)
+                    'another day. Default value is 7200s (two hours).',
+                    default=7200, required=False)
 
     parser.add_argument(
                     '-r', '--report',
@@ -116,8 +125,8 @@ def parse():
     if args.rng_seed is not None:
         settings.RNG_SEED = args.rng_seed
 
-    if args.global_timeout is not None:
-        settings.GLOBAL_TIMEOUT = float(args.global_timeout)
+    settings.TEST_TIMEOUT = float(args.test_timeout)
+    settings.GLOBAL_TIMEOUT = float(args.global_timeout)
 
     settings.DRY_RUN = args.dry_run
 
