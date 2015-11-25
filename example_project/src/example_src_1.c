@@ -47,6 +47,17 @@ int average(int x, int y)
 
 int lowest(int x, int y, int z)
 {
+    /* To test with mutated program getting stuck in a loop  */
+    while (true)
+    {
+        int a = 0;
+        
+        if (a == 0)
+        {
+            break;
+        }
+    }
+
     /* Redundant "and" condition */
     if (x < y && true)
     {
