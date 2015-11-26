@@ -21,19 +21,23 @@ import util.diff
 # Regex patterns for finding sequence directories
 #===============================================================================
 # Any sequence directory:
-# "year-month-day-minute-second-microsecond-*"
-#                     YYYY- MM- DD . hh . mm . ss-*
-SEQ_DIR_PATTERN = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-.*'
+# "[year][month][day].[hour].[minute].[second]-*"
+#                     YYYY MM DD . hh . mm . ss-*
+SEQ_DIR_PATTERN = r'^\d...\d.\d.\.\d.\.\d.\.\d.-.*'
 
 # Finalized sequence directory:
-# "year-month-day-minute-second-microsecond-year-*"
-#                              YYYY- MM- DD . hh . mm . ss- YYYY-*
-FINALIZED_SEQ_DIR_PATTERN = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-\d...-.*'
+# "[year][month][day].[hour].[minute].[second]-[year]*"
+#                               YYYY MM DD . hh . mm . ss- YYYY*
+FINALIZED_SEQ_DIR_PATTERN = r'^\d...\d.\d.\.\d.\.\d.\.\d.-\d....*'
 
 # Ongoing sequence directory:
-# "year-month-day-minute-second-microsecond-"
-#                             YYYY- MM- DD . hh . mm . ss-
-ONGOING_SEQ_DIR_PATTERN = r'^\d...-\d.-\d.\.\d.\.\d.\.\d.-$'
+# "[year][month][day].[hour].[minute].[second]-"
+#                             YYYY MM DD . hh . mm . ss-
+ONGOING_SEQ_DIR_PATTERN = r'^\d...\d.\d.\.\d.\.\d.\.\d.-$'
+
+# Date format for sequence directories (for converting between timestamps
+# and strings)
+SEQ_DIR_DATE_FORMAT = "%Y%m%d.%H.%M.%S"
 
 def init():
     '''
@@ -93,12 +97,8 @@ def get_seq_dirs():
 
     # Search for sub directories matching the sequence pattern
     for entry in dir_content:
-        if os.path.isdir(entry):
-
-            dir_path = settings.OUTPUT_PATH + '/' + entry
-
-            if _is_seq_dir(dir_path):
-                sub_dir_paths.append(dir_path)
+        if os.path.isdir(entry) and _is_seq_dir(entry):
+                sub_dir_paths.append(entry)
 
     return sub_dir_paths
 
@@ -110,9 +110,9 @@ def is_seq_finalized(path):
         util.log.exit_error('Path does not exist, or not a directory: ' +
                             path)
 
-    dirname = os.path.dirname(path)
+    dir_name = os.path.basename(path)
 
-    return re.match(FINALIZED_SEQ_DIR_PATTERN, dirname)
+    return re.match(FINALIZED_SEQ_DIR_PATTERN, dir_name)
 
 def get_seq_start_date(path):
     '''
@@ -122,8 +122,16 @@ def get_seq_start_date(path):
         util.log.exit_error('Path does not exist, or not a directory: ' +
                             path)
 
-    # TODO: Implement (can probably be done with strptime)
+    if not _is_seq_dir(path):
+        util.log.exit_error('Not a sequence directory: ' + path)
 
+    dir_name = os.path.basename(path)
+
+    start_str = dir_name.split('-')[0]
+
+    date = datetime.datetime.today().strptime(start_str, SEQ_DIR_DATE_FORMAT)
+
+    return date
 
 def get_seq_end_date(path):
     '''
@@ -134,12 +142,18 @@ def get_seq_end_date(path):
                             path)
 
     if not _is_seq_dir(path):
-        util.log.exit_error('Path is not a sequence directory: ' + path)
+        util.log.exit_error('Not a sequence directory: ' + path)
 
     if not is_seq_finalized(path):
         util.log.exit_error('Sequence directory not finalized: ' + path)
 
-    # TODO: Implement (can probably be done with strptime)
+    dir_name = os.path.basename(path)
+
+    end_str = dir_name.split('-')[1]
+
+    date = datetime.datetime.today().strptime(end_str, SEQ_DIR_DATE_FORMAT)
+
+    return date
 
 def is_patch_applied_cur_seq(file_path, patch_path):
     '''
@@ -369,4 +383,4 @@ def _get_cur_date_str():
     '''
     TBD
     '''
-    return datetime.datetime.today().strftime("%Y-%m-%d.%H.%M.%S")
+    return datetime.datetime.today().strftime(SEQ_DIR_DATE_FORMAT)

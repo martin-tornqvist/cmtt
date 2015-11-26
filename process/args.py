@@ -76,8 +76,11 @@ def parse():
                     help=
                     'Timeout for test executions (in seconds). If a test\n'
                     'execution subprocess has passed this limit, it is\n'
-                    'assumed to be stuck, and is killed. Default value is\n'
-                    '7200s (two hours).',
+                    'assumed to be stuck, and is killed. Alternatively, you\n'
+                    'could set this value very high, and handle timeouts\n'
+                    'yourself (e.g. in the test execution hook script). But\n'
+                    'one way or the other, you will probably need a timeout.\n'
+                    'The default value is 7200s (two hours).',
                     default=7200, required=False)
 
     parser.add_argument(
@@ -88,7 +91,8 @@ def parse():
                     'executed after the current one. (the number of possible\n'
                     'mutations is typically endless, so you will want to\n'
                     'abort execution at some point, perhaps to resume testing\n'
-                    'another day. Default value is 7200s (two hours).',
+                    'another day.\n'
+                    'The default value is 7200s (two hours).',
                     default=7200, required=False)
 
     parser.add_argument(

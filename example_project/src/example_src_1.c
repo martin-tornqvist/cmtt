@@ -6,6 +6,7 @@ static int useless_function()
 {
     int div = 3;
 
+    /* To test with mutated program crashing */
     int make_it_crash = 0;
 
     if (make_it_crash == true)
@@ -76,5 +77,6 @@ int lowest(int x, int y, int z)
         return y < z ? y : z;
     }
 
-    return x < y ? x : y; /* This is dead code */
+    /* This is dead code */
+    return x < y ? x : y;
 }

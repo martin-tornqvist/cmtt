@@ -15,17 +15,17 @@ h1 {
 h2 {
     font-family: sans-serif;
     color: Black;
-    font-size: 1.5em;
+    font-size: 1.2em;
     margin-top: 1.0em;
     margin-bottom: 0.5em;
     font-weight: bold;
-    border-bottom: medium double Gray;
+    border-bottom: 2px solid Gray;
 }
 
 h3 {
     font-family: sans-serif;
     color: Black;
-    font-size: 1.17em;
+    font-size: 1.10em;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     font-weight: bold;

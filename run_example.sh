@@ -11,7 +11,7 @@ example_path=`readlink -e ./example_project`
     --config-path=$example_path/mutation_config \
     --output-path=$example_path/mutation_output \
     --test-timeout=5 \
-    --global-timeout=10
+    --global-timeout=5
 
 # Mutation testing done, time to generate a report
 ./cmtt.py \

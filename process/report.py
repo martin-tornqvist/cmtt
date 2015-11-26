@@ -8,11 +8,11 @@ import shutil
 import util.log
 import util.html
 
-from process import settings
+from process import settings, seq
 
 def run():
     '''
-    TBD
+    Generates html reports based on the contents of the mutation output dir.
     '''
     # Copy style.css to output path
     util.log.info('Copying style.css to output path')
@@ -35,4 +35,21 @@ def run():
 
     util.html.header('This is a header', 1, html_path)
 
-    util.html.paragraph('This is a parapgraph, hello', html_path)
+    seq_dirs = seq.get_seq_dirs()
+
+    for seq_dir in seq_dirs:
+        start = seq.get_seq_start_date(seq_dir)
+
+        header_str = str(start.date()) + ' (' + str(start.time()) + ')'
+
+        if seq.is_seq_finalized(seq_dir):
+            end = seq.get_seq_end_date(seq_dir)
+
+            header_str += \
+                ' to ' + str(end.date()) + ' (' + str(end.time()) + ')'
+        else:
+            header_str += ' *** In progress ***'
+
+        util.html.header(header_str, 2, html_path)
+
+        util.html.paragraph('Stuff goes here...', html_path)
