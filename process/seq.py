@@ -106,6 +106,9 @@ def is_seq_finalized(path):
     '''
     Determines if a sequence is finalized by reading the directory name
     '''
+    if not os.path.isabs(path):
+        util.log.exit_error('Not absolute path: ' + path)
+
     if not os.path.isdir(path):
         util.log.exit_error('Path does not exist, or not a directory: ' +
                             path)
@@ -114,10 +117,46 @@ def is_seq_finalized(path):
 
     return re.match(FINALIZED_SEQ_DIR_PATTERN, dir_name)
 
+def get_mut_serial_dir_names(seq_path):
+    '''
+    Returns a sorted list of the names of all mutation serial directories under
+    the current sequence directory
+    '''
+    if not os.path.isabs(seq_path):
+        util.log.exit_error('Not absolute path: ' + seq_path)
+
+    if not os.path.isdir(seq_path):
+        util.log.exit_error('Missing directory: ' + seq_path)
+
+    if not _is_seq_dir(seq_path):
+        util.log.exit_error('Not a sequence directory: ' + seq_path)
+
+    os.chdir(seq_path)
+
+    mut_dirs = os.listdir('.')
+
+    # Strip non-digit directories (not mutation serial directories)
+    mut_dirs = [dir_name for dir_name in mut_dirs if dir_name.isdigit()]
+
+    # Sort the directories numerically
+    def numeric_compare(element_1, element_2):
+        '''
+        No docstring
+        '''
+        return int(element_1) - int(element_2)
+
+
+    mut_dirs.sort(key=functools.cmp_to_key(numeric_compare))
+
+    return mut_dirs
+
 def get_seq_start_date(path):
     '''
     Determines sequence start date by reading the directory name
     '''
+    if not os.path.isabs(path):
+        util.log.exit_error('Not absolute path: ' + path)
+
     if not os.path.isdir(path):
         util.log.exit_error('Path does not exist, or not a directory: ' +
                             path)
@@ -137,6 +176,9 @@ def get_seq_end_date(path):
     '''
     Determines sequence end date by reading the directory name
     '''
+    if not os.path.isabs(path):
+        util.log.exit_error('Not absolute path: ' + path)
+
     if not os.path.isdir(path):
         util.log.exit_error('Path does not exist, or not a directory: ' +
                             path)
@@ -175,7 +217,7 @@ def is_patch_applied_cur_seq(file_path, patch_path):
     if not os.path.isdir(settings.CUR_SEQ_DIR):
         util.log.exit_error('Missing sequence directory')
 
-    mut_dirs = _get_mut_serial_dirs()
+    mut_dirs = get_mut_serial_dir_names(settings.CUR_SEQ_DIR)
 
     for mut_dir_name in mut_dirs:
 
@@ -198,7 +240,7 @@ def mk_mut_serial_dir():
 
     os.chdir(settings.CUR_SEQ_DIR)
 
-    mut_dirs = _get_mut_serial_dirs()
+    mut_dirs = get_mut_serial_dir_names(settings.CUR_SEQ_DIR)
 
     serial_nr = -1
 
@@ -229,34 +271,9 @@ def _is_seq_dir(path):
         util.log.exit_error('Path does not exist, or not a directory: ' +
                             path)
 
-    return re.match(SEQ_DIR_PATTERN, path)
+    dir_name = os.path.basename(path)
 
-def _get_mut_serial_dirs():
-    '''
-    Returns a sorted list of the names of all mutation serial directories under
-    the current sequence directory
-    '''
-    if not os.path.isdir(settings.CUR_SEQ_DIR):
-        util.log.exit_error('Missing sequence directory')
-
-    os.chdir(settings.CUR_SEQ_DIR)
-
-    mut_dirs = os.listdir('.')
-
-    # Strip non-digit directories (not mutation serial directories)
-    mut_dirs = [dir_name for dir_name in mut_dirs if dir_name.isdigit()]
-
-    # Sort the directories numerically
-    def numeric_compare(element_1, element_2):
-        '''
-        No docstring
-        '''
-        return int(element_1) - int(element_2)
-
-
-    mut_dirs.sort(key=functools.cmp_to_key(numeric_compare))
-
-    return mut_dirs
+    return re.match(SEQ_DIR_PATTERN, dir_name)
 
 def _start_new_seq(src_base_sha1_list):
     '''
