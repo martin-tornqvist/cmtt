@@ -37,11 +37,47 @@ def header(text, level, html_path):
 
     _write('<h' + level_str + '>' + text + '</h' + level_str + '>', html_path)
 
-def paragraph(text, html_path):
+def text(text, html_path):
+    '''
+    Write preformatted text
+    '''
+    _write('<pre>' + text + '</pre>', html_path)
+
+def start_pre(html_path):
     '''
     TBD
     '''
-    _write('<pre>' + text + '</pre>', html_path)
+    _write('<pre>', html_path)
+
+def end_pre(html_path):
+    '''
+    TBD
+    '''
+    _write('</pre>', html_path)
+
+def raw(text, html_path):
+    '''
+    TBD
+    '''
+    _write(text, html_path)
+
+def inline(text, html_path):
+    '''
+    TBD
+    '''
+    _write('<span>' + text + '</span>', html_path)
+
+def newline(html_path):
+    '''
+    TBD
+    '''
+    _write('<br>', html_path)
+
+def link(text, url, html_path):
+    '''
+    TBD
+    '''
+    _write('<a href=' + url + ' target="_blank">' + text + '</a>', html_path)
 
 def _write(text, html_path):
     '''

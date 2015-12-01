@@ -19,10 +19,13 @@ def gen_patch(path_from, path_to, patch_output_path):
     if not os.path.isfile(path_to):
         log.exit_error('Missing file: ' + path_to)
 
-    nr_lines_context_str = '5'
+    nr_lines_context_str = '2'
 
-    subprocess.call('diff --show-c-function -u' + nr_lines_context_str + ' ' +
-                    path_from + ' ' + path_to +
+    subprocess.call('diff --show-c-function' +
+                    ' --label ' + path_from +
+                    ' --label ' + path_to +
+                    ' -u' + nr_lines_context_str +
+                    ' ' + path_from + ' ' + path_to +
                     ' > ' + patch_output_path,
                     shell=True)
 
@@ -42,7 +45,6 @@ def is_patch_applied(file_path, patch_path):
                                   shell=True)
 
     return return_code == 0
-
 
 def is_same(path_1, path_2):
     '''
